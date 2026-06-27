@@ -1,0 +1,66 @@
+# ============================================================
+# Root .gitignore for e-com-full monorepo
+#   admin/  - Flutter admin panel + Node backend (admin/server)
+#   user/   - Flutter customer app
+# ============================================================
+
+# ---- Node ----
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# ---- Environment / secrets ----
+.env
+.env.*
+!.env.example
+**/serviceAccount.json
+**/serviceAccountKey.json
+
+# ---- Backend runtime ----
+admin/server/uploads/*
+!admin/server/uploads/.gitkeep
+admin/server/server-run.log
+admin/server/server-run.err.log
+
+# ---- Flutter / Dart ----
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/build/
+**/.pub-cache/
+**/.pub/
+*.class
+*.lock.bak
+app.*.symbols
+app.*.map.json
+
+# ---- Firebase ----
+**/.firebase/
+.firebaserc.local
+
+# ---- Backup / scratch folders ----
+*.bak/
+admin/linux.bak/
+admin/macos.bak/
+admin/windows.bak/
+
+# ---- IDE / OS ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
+.history/
+
+# ---- Misc ----
+*.swp
+migrate_working_dir/
+
+# ---- Local secret backups (never commit) ----
+*.local.md
+*.local.txt
+SECRETS-BACKUP*
+*.secret.*

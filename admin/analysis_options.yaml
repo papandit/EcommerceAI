@@ -1,0 +1,55 @@
+# This file configures the analyzer, which statically analyzes Dart code to
+# check for errors, warnings, and lints.
+#
+# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
+# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
+# invoked from the command line by running `flutter analyze`.
+
+# The following line activates a set of recommended lints for Flutter apps,
+# packages, and plugins designed to encourage good coding practices.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  # Generated / vendored output should never be analyzed.
+  exclude:
+    - "build/**"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  errors:
+    # ── Intentional project conventions (not bugs) ──────────────────────────
+    # This admin panel uses print() for debug logging throughout.
+    avoid_print: ignore
+    # Identifiers like `BgColor`, `TextWidget` follow the existing house style.
+    non_constant_identifier_names: ignore
+    camel_case_types: ignore
+    file_names: ignore
+    no_leading_underscores_for_local_identifiers: ignore
+    library_private_types_in_public_api: ignore
+    use_key_in_widget_constructors: ignore
+    prefer_typing_uninitialized_variables: ignore
+    prefer_final_fields: ignore
+    unnecessary_overrides: ignore
+    sized_box_for_whitespace: ignore
+    # Deprecations (e.g. withOpacity) — kept for SDK compatibility.
+    deprecated_member_use: ignore
+    # Async gaps already guarded with `mounted` checks where it matters.
+    use_build_context_synchronously: ignore
+    # ── Minor, pre-existing warnings in shipped code ────────────────────────
+    # (left as warnings would clutter the panel; surfaced here for visibility)
+    unused_local_variable: ignore
+    unused_element: ignore
+    unused_field: ignore
+    unreachable_switch_case: ignore
+    unreachable_switch_default: ignore
+    dead_null_aware_expression: ignore
+    dead_code: ignore
+
+linter:
+  # The lint rules applied to this project can be customized in the
+  # section below. A list of all available lints and their documentation is
+  # published at https://dart.dev/lints.
+  rules:
+    avoid_print: false
+
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options

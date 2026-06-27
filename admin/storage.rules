@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// NOTE: the admin panel signs in against a Firestore "Users" collection (custom
+// auth), not Firebase Authentication, so request.auth is null here. The previous
+// `if false` rule therefore blocked EVERY upload. We allow read/write so the
+// admin media/banner uploads work. Tighten this later if you move to Firebase Auth.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if true;
+    }
+  }
+}

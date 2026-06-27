@@ -1,0 +1,187 @@
+{
+  "project_info": {
+    "project_number": "823307041176",
+    "firebase_url": "https://codingwitht-c6d0f-default-rtdb.firebaseio.com",
+    "project_id": "codingwitht-c6d0f",
+    "storage_bucket": "codingwitht-c6d0f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823307041176:android:9de98c51c13865e60653ed",
+        "android_client_info": {
+          "package_name": "com.example.cwt_ecommerce_admin_panel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "823307041176-2j63esictkvk21dkbn808r4nhsrjple6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdRjw0tdFdERdPZDoMagTbxPhSg368Zic"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "823307041176-2j63esictkvk21dkbn808r4nhsrjple6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "823307041176-2qk4gmft4qhspsnlvluc4bti6dvbbqto.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ecommerceAppUiWithLoginBackend"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823307041176:android:892482637f44e4c10653ed",
+        "android_client_info": {
+          "package_name": "com.example.cwt_ecommerce_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "823307041176-t8j3i74hjbpneim8u31g3bfcqj4htfn6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cwt_ecommerce_app",
+            "certificate_hash": "a99969d4dfc88a6fcf0b7cf19c5f1dc3548d7a2d"
+          }
+        },
+        {
+          "client_id": "823307041176-vr4tjp3l9nli5rg87vqunhsgs1nqv5m5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cwt_ecommerce_app",
+            "certificate_hash": "35da41da1ec5e34a97004ecc7e547a3f633a46b9"
+          }
+        },
+        {
+          "client_id": "823307041176-2j63esictkvk21dkbn808r4nhsrjple6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdRjw0tdFdERdPZDoMagTbxPhSg368Zic"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "823307041176-2j63esictkvk21dkbn808r4nhsrjple6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "823307041176-2qk4gmft4qhspsnlvluc4bti6dvbbqto.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ecommerceAppUiWithLoginBackend"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823307041176:android:3c0ae7c0dc34b2530653ed",
+        "android_client_info": {
+          "package_name": "com.example.ecommerce_app_ui_with_login_backend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "823307041176-kun16mo723tugpbptbcbupndhaubv8cn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ecommerce_app_ui_with_login_backend",
+            "certificate_hash": "35da41da1ec5e34a97004ecc7e547a3f633a46b9"
+          }
+        },
+        {
+          "client_id": "823307041176-2j63esictkvk21dkbn808r4nhsrjple6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdRjw0tdFdERdPZDoMagTbxPhSg368Zic"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "823307041176-2j63esictkvk21dkbn808r4nhsrjple6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "823307041176-2qk4gmft4qhspsnlvluc4bti6dvbbqto.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ecommerceAppUiWithLoginBackend"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823307041176:android:8c69b9976e2d25940653ed",
+        "android_client_info": {
+          "package_name": "com.example.t_store"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "823307041176-qfcmju8p2mbqre4rl5kufhr7dhs9hs33.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.t_store",
+            "certificate_hash": "35da41da1ec5e34a97004ecc7e547a3f633a46b9"
+          }
+        },
+        {
+          "client_id": "823307041176-2j63esictkvk21dkbn808r4nhsrjple6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdRjw0tdFdERdPZDoMagTbxPhSg368Zic"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "823307041176-2j63esictkvk21dkbn808r4nhsrjple6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "823307041176-2qk4gmft4qhspsnlvluc4bti6dvbbqto.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ecommerceAppUiWithLoginBackend"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="E-CommerceApp">
+  <meta name="google-signin-client_id"
+    content="479178218268-ge43h6idrjd6tlbo75csl5fc0fgkh4bi.apps.googleusercontent.com">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <title>E-CommerceApp</title>
+  <link rel="manifest" href="manifest.json">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    const serviceWorkerVersion = null;
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+  <!-- This script adds the flutter initialization JS code -->
+  <!-- <div if="recaptcha-container" data-sitekey="6LcsaxsdAAAAAEBn0sPDCEncnU9564MisyRuDzD_" data-callback="sendForm"
+    data-size="invisible">
+  </div> -->
+
+
+  <!-- <script type="text/javascript">
+    window.onload += function () {
+      document.getElementById("ThisWillBeNull").innerHTML = "Why is this null?";
+    }
+  </script> -->
+  <!-- Firebase is initialized by the Dart `firebase_core` plugin in main.dart.
+       (The previous inline ES-module block used bare specifiers like
+       "firebase/app", which browsers can't resolve, and broke page load.) -->
+  <!-- Razorpay Checkout (web) for online UPI/card/netbanking payments. -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="flutter.js" defer></script>
+</head>
+
+<body>
+  <div id="recaptcha-container"></div>
+  <script>
+    window.addEventListener('load', function (ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: function (engineInitializer) {
+          engineInitializer.initializeEngine().then(function (appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

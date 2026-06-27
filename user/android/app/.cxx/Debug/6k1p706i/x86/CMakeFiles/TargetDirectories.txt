@@ -1,0 +1,2 @@
+/Users/dreamworld/Documents/darshan/shiprocket/E-com-Front-Oneweb/android/app/.cxx/Debug/6k1p706i/x86/CMakeFiles/edit_cache.dir
+/Users/dreamworld/Documents/darshan/shiprocket/E-com-Front-Oneweb/android/app/.cxx/Debug/6k1p706i/x86/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/dreamworld/Documents/Nishant/FlutterSDK/fluter_sdk_3.24.5/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/dreamworld/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/dreamworld/Documents/darshan/shiprocket/E-com-Front-Oneweb/android/app/.cxx/Debug/6k1p706i/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/dreamworld/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/dreamworld/Documents/darshan/shiprocket/E-com-Front-Oneweb/android/app/.cxx/Debug/6k1p706i/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

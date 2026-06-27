@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="cwt_ecommerce_admin_panel">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <title>T Store</title>
+  <link rel="manifest" href="manifest.json">
+
+  <script>
+    const serviceWorkerVersion = null;
+  </script>
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js" defer></script>
+
+
+  <!-- <script type="text/javascript">
+    window.flutterWebRenderer = "html";
+</script> -->
+
+
+</head>
+
+<body>
+  <!-- Create a progress bar container with a nested progress bar -->
+  <!-- Loading indicator -->
+  <div id="loading">
+    <style>
+      body {
+        inset: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        position: fixed;
+      }
+
+      #loading {
+        align-items: center;
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        width: 100%;
+      }
+
+      #loading img {
+        animation: 1s ease-in-out 0s infinite alternate breathe;
+        opacity: 1;
+        transition: opacity .4s;
+        max-width: 320px;
+        width: 60vw;
+        height: auto;
+      }
+
+      #loading.main_done img {
+        opacity: 1;
+      }
+
+      #loading.init_done img {
+        animation: .33s ease-in-out 0s 1 forwards zooooom;
+        opacity: .05;
+      }
+
+      @keyframes breathe {
+        from {
+          transform: scale(1)
+        }
+
+        to {
+          transform: scale(0.95)
+        }
+      }
+
+      @keyframes zooooom {
+        from {
+          transform: scale(1)
+        }
+
+        to {
+          transform: scale(10)
+        }
+      }
+    </style>
+    <img src="onewebmart_logo.png" alt="onewebmart" />
+  </div>
+  <script>
+    window.addEventListener('load', function (ev) {
+      // Register the FCM service worker (non-blocking — never gates app load).
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+          .register('firebase-messaging-sw.js')
+          .catch(function (e) { });
+      }
+
+      var loading = document.querySelector('#loading');
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: function (engineInitializer) {
+          if (loading) loading.classList.add('main_done');
+          engineInitializer.initializeEngine().then(function (appRunner) {
+            if (loading) loading.classList.add('init_done');
+            appRunner.runApp();
+            window.setTimeout(function () {
+              if (loading) loading.remove();
+            }, 50);
+          });
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
