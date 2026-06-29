@@ -4,6 +4,9 @@ class TTexts {
   static const String adminEmail = "spdadmin@gmail.com";
   static const String adminPassword = "123456";
 
+  // -- Customer storefront (where non-admin logins are redirected)
+  static const String mainSiteUrl = "https://ecommai.onewebmart.cloud/";
+
   // -- Storage Paths
   static const String bannersStoragePath = "/Banners";
   static const String brandsStoragePath = "/Brands";

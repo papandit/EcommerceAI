@@ -1,5 +1,8 @@
 node_modules/
 .env
+.env.migrate
+data-export/
+*.zip
 uploads/*
 !uploads/.gitkeep
 serviceAccount.json

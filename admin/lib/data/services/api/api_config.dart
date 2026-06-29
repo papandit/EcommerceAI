@@ -13,14 +13,17 @@ import 'package:flutter/foundation.dart';
 class ApiConfig {
   ApiConfig._();
 
-  /// Set this (non-null) to force a base URL everywhere (e.g. production).
-  static const String? overrideBaseUrl = null;
+  /// Force a base URL everywhere (e.g. production). Provided at build time via
+  ///   flutter build web --release --dart-define=API_BASE_URL=https://ecommai.onewebmart.cloud
+  /// When empty (local dev), the platform defaults below are used (localhost).
+  static const String overrideBaseUrl =
+      String.fromEnvironment('API_BASE_URL', defaultValue: '');
 
   static const int _port = 4000;
 
   static String get origin {
-    if (overrideBaseUrl != null && overrideBaseUrl!.isNotEmpty) {
-      return overrideBaseUrl!;
+    if (overrideBaseUrl.isNotEmpty) {
+      return overrideBaseUrl;
     }
     if (kIsWeb) return 'http://localhost:$_port';
     // Non-web: distinguish Android emulator (needs 10.0.2.2) from others.

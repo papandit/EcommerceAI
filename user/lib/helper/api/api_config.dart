@@ -8,14 +8,17 @@ import 'package:flutter/foundation.dart';
 class ApiConfig {
   ApiConfig._();
 
-  /// Set this to force a base URL everywhere (e.g. your Hostinger domain).
-  static const String? overrideBaseUrl = null;
+  /// Force a base URL everywhere (e.g. your live domain). Provided at build time:
+  ///   flutter build web --release --dart-define=API_BASE_URL=https://ecommai.onewebmart.cloud
+  /// When empty (local dev), the platform defaults below are used (localhost).
+  static const String overrideBaseUrl =
+      String.fromEnvironment('API_BASE_URL', defaultValue: '');
 
   static const int _port = 4000;
 
   static String get origin {
-    if (overrideBaseUrl != null && overrideBaseUrl!.isNotEmpty) {
-      return overrideBaseUrl!;
+    if (overrideBaseUrl.isNotEmpty) {
+      return overrideBaseUrl;
     }
     if (kIsWeb) return 'http://localhost:$_port';
     switch (defaultTargetPlatform) {

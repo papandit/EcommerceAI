@@ -1,7 +1,9 @@
 import 'package:cwt_ecommerce_admin_panel/features/personalization/controllers/settings_controller.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../data/repositories/authentication/authentication_repository.dart';
 import '../../../../utils/constants/image_strings.dart';
@@ -88,20 +90,37 @@ class LoginController extends GetxController {
       // Remove Loader
       TFullScreenLoader.stopLoading();
 
-      // If user is not admin, logout and return
+      // Admin -> admin panel. Any other (customer) account -> the main store site.
       if (user.role != AppRole.admin) {
+        // Clear the admin-app session, then send them to the storefront
+        // (works on both web and mobile).
         await AuthenticationRepository.instance.logout();
-        TLoaders.errorSnackBar(
-            title: 'Not Authorized',
-            message: 'You are not authorized or do have access. Contact Admin');
+        await _redirectToStorefront();
       } else {
-        // Redirect
-
+        // Redirect to the admin dashboard.
         AuthenticationRepository.instance.screenRedirect();
       }
     } catch (e) {
       TFullScreenLoader.stopLoading();
       TLoaders.errorSnackBar(title: 'Oh Snap', message: e.toString());
+    }
+  }
+
+  /// Sends a non-admin (customer) account to the main storefront site.
+  /// On web this replaces the current tab; on mobile it opens the store URL
+  /// in the external browser.
+  Future<void> _redirectToStorefront() async {
+    final uri = Uri.parse(TTexts.mainSiteUrl);
+    try {
+      if (kIsWeb) {
+        await launchUrl(uri, webOnlyWindowName: '_self');
+      } else {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {
+      TLoaders.warningSnackBar(
+          title: 'Customer Account',
+          message: 'This is a customer account. Please shop at ${TTexts.mainSiteUrl}');
     }
   }
 
