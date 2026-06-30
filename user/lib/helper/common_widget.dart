@@ -22,6 +22,7 @@ import 'package:EcommerceApp/view/myorder.dart';
 import 'package:EcommerceApp/view/notificationpage.dart';
 import 'package:EcommerceApp/view/profileupdate.dart';
 import 'package:EcommerceApp/view/searchpage.dart';
+import 'package:EcommerceApp/view/tryon_history_page.dart';
 import 'package:EcommerceApp/viewmodel/homecontroller.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -1513,6 +1514,12 @@ class CommonWidget extends StatefulWidget {
                               context: context,
                               routename: '/DeliveryAdressadd',
                               screen: DeliveryAdressadd()));
+                    } else if (value == MenuItems.tryon) {
+                      Future.delayed(const Duration(milliseconds: 500)).then(
+                          (value) => WebAPPNavigation.navigateToroute(
+                              context: context,
+                              routename: '/TryOnHistory',
+                              screen: const TryOnHistoryPage()));
                     } else if (value == MenuItems.logout) {
                       LogoutPopup(context, tap: () async {
                         final SharedPreferences preferences =
@@ -2633,7 +2640,7 @@ class MenuItem {
 }
 
 abstract class MenuItems {
-  static const List<MenuItem> firstItems = [home, share, settings];
+  static const List<MenuItem> firstItems = [home, share, settings, tryon];
   static const List<MenuItem> secondItems = [logout];
   static const List<MenuItem> unverifyed = [login];
 
@@ -2643,6 +2650,8 @@ abstract class MenuItems {
       MenuItem(text: 'Billing Address', icon: Icons.add_home_work_sharp);
   static const settings =
       MenuItem(text: 'Order Data', icon: Icons.arrow_circle_up);
+  static const tryon =
+      MenuItem(text: 'My Try-Ons', icon: Icons.auto_awesome);
   static const logout = MenuItem(text: 'Log Out', icon: Icons.logout);
 
   static Widget buildItem(MenuItem item) {
@@ -2678,6 +2687,12 @@ abstract class MenuItems {
       case MenuItems.settings:
 
         //Do something
+        break;
+      case MenuItems.tryon:
+        WebAPPNavigation.navigateToroute(
+            context: context,
+            routename: '/TryOnHistory',
+            screen: const TryOnHistoryPage());
         break;
       case MenuItems.share:
         //Do something
