@@ -269,9 +269,11 @@ class _ContectUsState extends State<ContectUs> {
           _contactInfoRow(Icons.location_on_outlined, "VISIT US",
               "447, Ramkrupa Soc., Matavadi Chok, Bhuj - 350005"),
           SizedBox(height: 18),
-          _contactInfoRow(Icons.call_outlined, "CALL US", "99999 99999"),
+          _contactInfoRow(Icons.call_outlined, "CALL US",
+              "+91 9033806717\n+91 9408307302"),
           SizedBox(height: 18),
-          _contactInfoRow(Icons.mail_outline, "EMAIL US", "Test@gmail.com"),
+          _contactInfoRow(
+              Icons.mail_outline, "EMAIL US", "business@onewebmart.com"),
           SizedBox(height: 18),
           _contactInfoRow(Icons.schedule_outlined, "HOURS",
               "Mon – Sat · 10:00 AM – 8:00 PM"),
@@ -287,14 +289,16 @@ class _ContectUsState extends State<ContectUs> {
           SizedBox(height: 12),
           Row(
             children: [
-              _socialIcon("assets/image/facebook.svg", () {
-                CommonWidget()
-                    .launchFacebook("https://facebook.com", "https://facebook.com");
+              _socialIcon("assets/image/linkedin.svg", () {
+                CommonWidget().launchFacebook(
+                    "https://www.linkedin.com/company/onewebmart-solution",
+                    "https://www.linkedin.com/company/onewebmart-solution");
               }),
               SizedBox(width: 12),
               _socialIcon("assets/image/instagram.svg", () {
                 CommonWidget().launchFacebook(
-                    "https://instagram.com", "https://instagram.com");
+                    "https://www.instagram.com/onewebmart/",
+                    "https://www.instagram.com/onewebmart/");
               }),
             ],
           ),

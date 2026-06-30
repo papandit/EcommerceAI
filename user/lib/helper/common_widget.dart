@@ -1618,6 +1618,8 @@ class CommonWidget extends StatefulWidget {
           Divider(color: Colors.white.withOpacity(0.10), thickness: 1, height: 1),
           SizedBox(height: 26),
           _footerLinkColumns(context),
+          SizedBox(height: 24),
+          _footerGetInTouch(context),
           SizedBox(height: 10),
           socialmedia(context),
           SizedBox(height: 22),
@@ -1645,14 +1647,71 @@ class CommonWidget extends StatefulWidget {
                     width: 4,
                     decoration: BoxDecoration(
                         color: AppColor.accent, shape: BoxShape.circle)),
-                Text(
-                  "All rights reserved",
-                  style: TextStyle(
-                      color: Colors.white.withOpacity(0.65), fontSize: 13),
+                InkWell(
+                  onTap: () => launchFacebook(
+                      "https://onewebmart.com/", "https://onewebmart.com/"),
+                  child: Text(
+                    "All rights reserved by onewebmart.com",
+                    style: TextStyle(
+                        color: Colors.white.withOpacity(0.75),
+                        fontSize: 13,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.white.withOpacity(0.5)),
+                  ),
                 ),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  // ---- "Get In Touch" block (email + phone numbers) shown in the footer ----
+  Widget _footerGetInTouch(BuildContext context) {
+    Widget contactLine(String text, String url, IconData icon) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: InkWell(
+          onTap: () => launchFacebook(url, url),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 17, color: AppColor.accent),
+              SizedBox(width: 10),
+              Text(
+                text,
+                style: TextStyle(
+                    color: AppColor.accent,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Get In Touch",
+            style: TextStyle(
+                fontFamily: AppFont.heading,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: AppColor.whiteColor),
+          ),
+          SizedBox(height: 16),
+          contactLine("business@onewebmart.com",
+              "mailto:business@onewebmart.com", Icons.mail_outline),
+          contactLine(
+              "+91 9033806717", "tel:+919033806717", Icons.call_outlined),
+          contactLine(
+              "+91 9408307302", "tel:+919408307302", Icons.call_outlined),
         ],
       ),
     );
@@ -2052,10 +2111,9 @@ class CommonWidget extends StatefulWidget {
                   InkWell(
                     overlayColor: WidgetStatePropertyAll(AppColor.BgColor),
                     onTap: () {
-                      String digital_url = "https://facebook.com";
-
-                      var fbUrl = "fb://facewebmodal/f?href=" + digital_url;
-                      launchFacebook(fbUrl, digital_url);
+                      String url =
+                          "https://www.linkedin.com/company/onewebmart-solution";
+                      launchFacebook(url, url);
                     },
                     child: Container(
                       height: 40,
@@ -2068,7 +2126,7 @@ class CommonWidget extends StatefulWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: SvgPicture.asset(
-                          "assets/image/facebook.svg",
+                          "assets/image/linkedin.svg",
                           height: 30,
                           width: 30,
                           color: AppColor.BgColor,
@@ -2079,10 +2137,8 @@ class CommonWidget extends StatefulWidget {
                   InkWell(
                     overlayColor: WidgetStatePropertyAll(AppColor.BgColor),
                     onTap: () {
-                      String nativeUrl =
-                          "instagram://user?username=severinas_app";
-                      String webUrl = "https://www.instagram.com";
-                      launchFacebook(nativeUrl, webUrl);
+                      String webUrl = "https://www.instagram.com/onewebmart/";
+                      launchFacebook(webUrl, webUrl);
                     },
                     child: Container(
                       height: 40,
