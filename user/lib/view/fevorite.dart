@@ -1669,7 +1669,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                                 ),
                                           Container(
                                             child: Text(
-                                              "₹ ${double.parse(firebaseWishlsit[index].saleprice!.toString()).toStringAsFixed(2)}",
+                                              "₹ ${double.parse(firebaseWishlsit[index].saleprice!.toString()).toStringAsFixed(0)}",
                                               style: TextStyle(
                                                   color: AppColor.BlackColor,
                                                   fontSize: 16,
@@ -2146,8 +2146,8 @@ class _FavoritePageState extends State<FavoritePage> {
                                               ),
                                         Container(
                                           child: Text(
-                                            "₹ ${double.parse(firebaseWishlsit[index].saleprice.toString()).toStringAsFixed(2)}",
-                                            // "₹ ${(int.parse(firebaseWishlsit[index].price!) - (int.parse(firebaseWishlsit[index].price!) * (int.parse(firebaseWishlsit[index].saleprice!) * 0.01))).toStringAsFixed(2)}",
+                                            "₹ ${double.parse(firebaseWishlsit[index].saleprice.toString()).toStringAsFixed(0)}",
+                                            // "₹ ${(int.parse(firebaseWishlsit[index].price!) - (int.parse(firebaseWishlsit[index].price!) * (int.parse(firebaseWishlsit[index].saleprice!) * 0.01))).toStringAsFixed(0)}",
                                             style: TextStyle(
                                                 color: AppColor.BlackColor,
                                                 fontSize: 14,

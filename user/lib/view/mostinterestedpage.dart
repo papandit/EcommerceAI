@@ -527,7 +527,7 @@ class _ViewAllState extends State<ViewAll> {
                                       Container(
                                         child: Text(
                                           // "₹ ${viewall[index].salePrice}.00",
-                                          "₹ ${(viewall[index].price - (viewall[index].price * (viewall[index].salePrice * 0.01))).toStringAsFixed(2)}",
+                                          "₹ ${(viewall[index].price - (viewall[index].price * (viewall[index].salePrice * 0.01))).toStringAsFixed(0)}",
                                           style: TextStyle(
                                               color: AppColor.BlackColor,
                                               fontSize: 16,
@@ -987,7 +987,7 @@ class _ViewAllState extends State<ViewAll> {
                                             Container(
                                               child: Text(
                                                 // "₹ ${viewall[index].salePrice}.00",
-                                                "₹ ${(viewall[index].price - (viewall[index].price * (viewall[index].salePrice * 0.01))).toStringAsFixed(2)}",
+                                                "₹ ${(viewall[index].price - (viewall[index].price * (viewall[index].salePrice * 0.01))).toStringAsFixed(0)}",
                                                 style: TextStyle(
                                                     color: AppColor.BlackColor,
                                                     fontSize: 14,

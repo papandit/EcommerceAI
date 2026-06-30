@@ -1341,7 +1341,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         TextStyle(fontSize: 16, color: AppColor.fontColorgrey),
                   ),
                   Text(
-                    "₹ ${shoppingDetailController.discountedsubtotal != 0.0 ? shoppingDetailController.discountedsubtotal.toStringAsFixed(2) : shoppingDetailController.subtotal.toStringAsFixed(2)}",
+                    "₹ ${shoppingDetailController.discountedsubtotal != 0.0 ? shoppingDetailController.discountedsubtotal.toStringAsFixed(0) : shoppingDetailController.subtotal.toStringAsFixed(0)}",
                     style:
                         TextStyle(fontSize: 16, color: AppColor.viewallcolor),
                   ),
@@ -1377,7 +1377,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         TextStyle(fontSize: 16, color: AppColor.fontColorgrey),
                   ),
                   Text(
-                    '${shoppingDetailController.discountedsubtotal != 0.0 ? (shoppingDetailController.discountedsubtotal * (shoppingDetailController.taxpayment * 0.01)).round() : (shoppingDetailController.subtotal * (shoppingDetailController.taxpayment * 0.01)).round()}', //  "${((isdiscount == true ? shoppingDetailController.discountedsubtotal : (shoppingDetailController.subtotal)) * (shoppingDetailController.taxpayment * 0.01)).toStringAsFixed(2)}",
+                    '${shoppingDetailController.discountedsubtotal != 0.0 ? (shoppingDetailController.discountedsubtotal * (shoppingDetailController.taxpayment * 0.01)).round() : (shoppingDetailController.subtotal * (shoppingDetailController.taxpayment * 0.01)).round()}', //  "${((isdiscount == true ? shoppingDetailController.discountedsubtotal : (shoppingDetailController.subtotal)) * (shoppingDetailController.taxpayment * 0.01)).toStringAsFixed(0)}",
 
                     style:
                         TextStyle(fontSize: 16, color: AppColor.viewallcolor),

@@ -1402,7 +1402,7 @@ class _PopularPageState extends State<PopularPage> {
                                           Container(
                                             child: Text(
                                               // "₹ ${widget.visitlist![index].salePrice}.00",
-                                              "₹ ${(widget.visitlist![index].price - (widget.visitlist![index].price * (widget.visitlist![index].salePrice * 0.01))).toStringAsFixed(2)}",
+                                              "₹ ${(widget.visitlist![index].price - (widget.visitlist![index].price * (widget.visitlist![index].salePrice * 0.01))).toStringAsFixed(0)}",
                                               style: TextStyle(
                                                   color: AppColor.BlackColor,
                                                   fontSize: 14,
@@ -1615,7 +1615,7 @@ class _PopularPageState extends State<PopularPage> {
                                       Container(
                                         child: Text(
                                           // "₹ ${widget.visitlist![index].salePrice}.00",
-                                          "₹ ${(widget.visitlist![index].price - (widget.visitlist![index].price * (widget.visitlist![index].salePrice * 0.01))).toStringAsFixed(2)}",
+                                          "₹ ${(widget.visitlist![index].price - (widget.visitlist![index].price * (widget.visitlist![index].salePrice * 0.01))).toStringAsFixed(0)}",
                                           style: TextStyle(
                                               color: AppColor.BlackColor,
                                               fontSize: 14,

@@ -528,7 +528,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                       ? Row(
                           children: [
                             Text(
-                              "₹ ${shoppingDetailController.subtotal.toStringAsFixed(2)}",
+                              "₹ ${shoppingDetailController.subtotal.toStringAsFixed(0)}",
                               style: TextStyle(
                                   decoration: TextDecoration.lineThrough,
                                   decorationColor: Colors.grey,
@@ -541,7 +541,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                               width: 20,
                             ),
                             Text(
-                              "₹ ${shoppingDetailController.discountedsubtotal.toStringAsFixed(2)}",
+                              "₹ ${shoppingDetailController.discountedsubtotal.toStringAsFixed(0)}",
                               style: TextStyle(
                                   fontSize:
                                       Responsive.isMobile(context) ? 16 : 20,
@@ -551,7 +551,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                           ],
                         )
                       : Text(
-                          "₹ ${shoppingDetailController.subtotal.toStringAsFixed(2)}",
+                          "₹ ${shoppingDetailController.subtotal.toStringAsFixed(0)}",
                           style: TextStyle(
                               fontSize: Responsive.isMobile(context) ? 16 : 20,
                               color: AppColor.viewallcolor),
@@ -591,7 +591,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                         color: AppColor.fontColorgrey),
                   ),
                   Text(
-                    "${((isdiscount == true ? shoppingDetailController.discountedsubtotal : (shoppingDetailController.subtotal)) * (shoppingDetailController.taxpayment * 0.01)).toStringAsFixed(2)}",
+                    "${((isdiscount == true ? shoppingDetailController.discountedsubtotal : (shoppingDetailController.subtotal)) * (shoppingDetailController.taxpayment * 0.01)).toStringAsFixed(0)}",
                     style: TextStyle(
                         fontSize: Responsive.isMobile(context) ? 16 : 20,
                         color: AppColor.viewallcolor),
@@ -616,7 +616,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                   ),
                 ),
                 Text(
-                  "₹ ${shoppingDetailController.finaltotalpayment.toStringAsFixed(2)}",
+                  "₹ ${shoppingDetailController.finaltotalpayment.toStringAsFixed(0)}",
                   style: TextStyle(
                       fontSize: Responsive.isMobile(context) ? 16 : 20,
                       fontWeight: FontWeight.w600,
@@ -1227,7 +1227,7 @@ class _ListTileItemNewState extends State<ListTileItemNew> {
                           ),
                           Flexible(
                             child: Text(
-                              '₹ ${double.parse(homecontoller.MyCart.cartitems![widget.index!].price!.toString()).toStringAsFixed(2)}',
+                              '₹ ${double.parse(homecontoller.MyCart.cartitems![widget.index!].price!.toString()).toStringAsFixed(0)}',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize:

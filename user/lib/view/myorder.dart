@@ -560,7 +560,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                 ),
               ),
               Text(
-                "₹ ${double.parse(order.totalAmount.toString()).toStringAsFixed(2)}",
+                "₹ ${double.parse(order.totalAmount.toString()).toStringAsFixed(0)}",
                 style: TextStyle(
                     fontSize: 18,
                     color: AppColor.primary,

@@ -1996,7 +1996,7 @@ class _SearchPageState extends State<SearchPage> {
                                           Container(
                                             child: Text(
                                               // "₹ ${Viwerlist[index].salePrice}.00",
-                                              "₹ ${(productList[index].price - (productList[index].price * (productList[index].salePrice * 0.01))).toStringAsFixed(2)}",
+                                              "₹ ${(productList[index].price - (productList[index].price * (productList[index].salePrice * 0.01))).toStringAsFixed(0)}",
                                               style: TextStyle(
                                                   color: AppColor.BlackColor,
                                                   fontSize: 14,
@@ -2448,7 +2448,7 @@ class _SearchPageState extends State<SearchPage> {
                                       Container(
                                         child: Text(
                                           // "₹ ${Viwerlist[index].salePrice}.00",
-                                          "₹ ${(productList[index].price - (productList[index].price * (productList[index].salePrice * 0.01))).toStringAsFixed(2)}",
+                                          "₹ ${(productList[index].price - (productList[index].price * (productList[index].salePrice * 0.01))).toStringAsFixed(0)}",
                                           style: TextStyle(
                                               color: AppColor.BlackColor,
                                               fontSize: 14,

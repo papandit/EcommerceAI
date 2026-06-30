@@ -857,7 +857,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "₹ ${(widget.productModel!.price - (widget.productModel!.price * (widget.productModel!.salePrice * 0.01))).toStringAsFixed(2)}",
+                        "₹ ${(widget.productModel!.price - (widget.productModel!.price * (widget.productModel!.salePrice * 0.01))).toStringAsFixed(0)}",
                         style: TextStyle(
                             fontSize: Responsive.isMobile(context) ? 24 : 30,
                             fontWeight: FontWeight.w700,
@@ -1060,7 +1060,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     (widget.productModel!.price *
                                         (widget.productModel!.salePrice *
                                             0.01)))))
-                            .toStringAsFixed(2)
+                            .toStringAsFixed(0)
                             .toString(),
                     size: 16.0,
                     weight: FontWeight.w600),
@@ -3810,7 +3810,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           Container(
                                             child: Text(
                                               // "₹ ${Viwerlist[index].salePrice}.00",
-                                              "₹ ${(Viwerlist[index].price - (Viwerlist[index].price * (Viwerlist[index].salePrice * 0.01))).toStringAsFixed(2)}",
+                                              "₹ ${(Viwerlist[index].price - (Viwerlist[index].price * (Viwerlist[index].salePrice * 0.01))).toStringAsFixed(0)}",
                                               style: TextStyle(
                                                   color: AppColor.BlackColor,
                                                   fontSize: 14,

@@ -61,9 +61,9 @@ class _OrderDetailsState extends State<OrderDetails> {
           "item": element.title,
           "color": element.color,
           "size": element.size,
-          "price": price.toStringAsFixed(2),
+          "price": price.toStringAsFixed(0),
           "quantity": qty,
-          "totalPrice": (price * qty).toStringAsFixed(2),
+          "totalPrice": (price * qty).toStringAsFixed(0),
         },
       );
     }
@@ -170,7 +170,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                 pw.Align(
                   alignment: pw.Alignment.centerRight,
                   child: pw.Text(
-                    'Total: ${double.parse(orderdetails!.totalAmount.toString()).toStringAsFixed(2)}',
+                    'Total: ${double.parse(orderdetails!.totalAmount.toString()).toStringAsFixed(0)}',
                     style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                   ),
                 ),
@@ -674,7 +674,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       DataCell(
         CommonWidget().TextWidget(
             text:
-                "₹ ${double.parse((orderdetails!.items![index].price ?? 0).toString()).toStringAsFixed(2)} ",
+                "₹ ${double.parse((orderdetails!.items![index].price ?? 0).toString()).toStringAsFixed(0)} ",
             weight: FontWeight.w700,
             size: Responsive.isMobile(context) ? 14.0 : 18.0,
             color: AppColor.viewallcolor),
@@ -696,7 +696,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       DataCell(
         CommonWidget().TextWidget(
             text:
-                "₹ ${(double.parse((orderdetails!.items![index].price ?? 0).toString()) * (orderdetails!.items![index].quantity ?? 1)).toStringAsFixed(2)} ",
+                "₹ ${(double.parse((orderdetails!.items![index].price ?? 0).toString()) * (orderdetails!.items![index].quantity ?? 1)).toStringAsFixed(0)} ",
             weight: FontWeight.w700,
             size: Responsive.isMobile(context) ? 14.0 : 18.0,
             color: AppColor.viewallcolor),
@@ -802,7 +802,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                               color: AppColor.fontColorgrey),
                         ),
                         Text(
-                          "₹ ${((double.parse(orderdetails!.subtotal ?? "0") * int.parse((orderdetails!.coupanModel!.percentage.isEmpty ? "0" : orderdetails!.coupanModel!.percentage))) * 0.01).toStringAsFixed(2)}",
+                          "₹ ${((double.parse(orderdetails!.subtotal ?? "0") * int.parse((orderdetails!.coupanModel!.percentage.isEmpty ? "0" : orderdetails!.coupanModel!.percentage))) * 0.01).toStringAsFixed(0)}",
                           style: TextStyle(
                               fontSize: Responsive.isMobile(context) ? 16 : 20,
                               color: AppColor.viewallcolor),
@@ -1173,7 +1173,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                               ),
                               CommonWidget().TextWidget(
                                 text:
-                                    "₹ ${double.parse(orderdetails!.items![index].price.toString()).toStringAsFixed(2)} ",
+                                    "₹ ${double.parse(orderdetails!.items![index].price.toString()).toStringAsFixed(0)} ",
                                 weight: FontWeight.w700,
                                 size:
                                     Responsive.isMobile(context) ? 14.0 : 18.0,
@@ -1192,7 +1192,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                               Spacer(),
                               CommonWidget().TextWidget(
                                 text:
-                                    "₹ ${((orderdetails!.items![index].price ?? 0) * (orderdetails!.items![index].quantity ?? 1)).toStringAsFixed(2)}",
+                                    "₹ ${((orderdetails!.items![index].price ?? 0) * (orderdetails!.items![index].quantity ?? 1)).toStringAsFixed(0)}",
                                 weight: FontWeight.w700,
                                 size:
                                     Responsive.isMobile(context) ? 14.0 : 18.0,
@@ -1272,7 +1272,7 @@ class _OrderDetailsState extends State<OrderDetails> {
               //                 ),
               //                 CommonWidget().TextWidget(
               //                     text:
-              //                         "₹ ${double.parse(orderdetails!.items![index].price.toString()).toStringAsFixed(2)} ",
+              //                         "₹ ${double.parse(orderdetails!.items![index].price.toString()).toStringAsFixed(0)} ",
               //                     weight: FontWeight.w700,
               //                     size: Responsive.isMobile(context)
               //                         ? 14.0
@@ -1297,7 +1297,7 @@ class _OrderDetailsState extends State<OrderDetails> {
               //                 ),
               //                 CommonWidget().TextWidget(
               //                     text:
-              //                         "₹ ${double.parse(((orderdetails!.items![index].price ?? 0) * (orderdetails!.items![index].quantity ?? 1).toDouble()).toString()).toStringAsFixed(2)} ",
+              //                         "₹ ${double.parse(((orderdetails!.items![index].price ?? 0) * (orderdetails!.items![index].quantity ?? 1).toDouble()).toString()).toStringAsFixed(0)} ",
               //                     weight: FontWeight.w700,
               //                     size: Responsive.isMobile(context)
               //                         ? 14.0
@@ -1383,7 +1383,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     ),
                     CommonWidget().TextWidget(
                         text:
-                            "₹ ${double.parse(orderdetails!.items![index].price.toString()).toStringAsFixed(2)} ",
+                            "₹ ${double.parse(orderdetails!.items![index].price.toString()).toStringAsFixed(0)} ",
                         weight: FontWeight.w700,
                         size: Responsive.isMobile(context) ? 14.0 : 18.0,
                         color: AppColor.viewallcolor),
@@ -1403,7 +1403,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     Spacer(),
                     CommonWidget().TextWidget(
                         text:
-                            "₹ ${double.parse(((orderdetails!.items![index].price ?? 0) * (orderdetails!.items![index].quantity ?? 1).toDouble()).toString()).toStringAsFixed(2)} ",
+                            "₹ ${double.parse(((orderdetails!.items![index].price ?? 0) * (orderdetails!.items![index].quantity ?? 1).toDouble()).toString()).toStringAsFixed(0)} ",
                         weight: FontWeight.w700,
                         size: Responsive.isMobile(context) ? 14.0 : 18.0,
                         color: AppColor.viewallcolor),

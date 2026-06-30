@@ -28,8 +28,8 @@ class OrderInvoiceApi {
         (it.title ?? '').toString(),
         (it.size ?? '-').toString(),
         '$qty',
-        'Rs ${price.toStringAsFixed(2)}',
-        'Rs ${(price * qty).toStringAsFixed(2)}',
+        'Rs ${price.toStringAsFixed(0)}',
+        'Rs ${(price * qty).toStringAsFixed(0)}',
       ];
     }).toList();
 
@@ -51,7 +51,7 @@ class OrderInvoiceApi {
                     fontSize: bold ? 12 : 10.5,
                     fontWeight:
                         bold ? pw.FontWeight.bold : pw.FontWeight.normal)),
-            pw.Text('Rs ${value.toStringAsFixed(2)}',
+            pw.Text('Rs ${value.toStringAsFixed(0)}',
                 style: pw.TextStyle(
                     color: bold ? accent : ink,
                     fontSize: bold ? 12 : 10.5,
