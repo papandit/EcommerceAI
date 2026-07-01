@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../../common/widgets/breadcrumbs/breadcrumb_with_heading.dart';
 import '../../../../../../utils/constants/sizes.dart';
+import '../widgets/credit_costing_dashboard.dart';
 import '../widgets/image_meta.dart';
 import '../widgets/settings_form.dart';
 
@@ -24,6 +25,10 @@ class SettingsMobileScreen extends StatelessWidget {
               Column(
                 children: [
                   ImageAndMeta(),
+                  SizedBox(height: TSizes.spaceBtwSections),
+
+                  // Try-On credit costing dashboard
+                  CreditCostingDashboard(),
                   SizedBox(height: TSizes.spaceBtwSections),
 
                   // Form
