@@ -2,6 +2,8 @@ const bs = require('../services/brandshoot');
 const Product = require('../models/product.model');
 const TryOnJob = require('../models/tryOnJob.model');
 const Settings = require('../models/settings.model');
+const User = require('../models/user.model');
+const credits = require('../utils/credits');
 const { ok, fail, asyncHandler } = require('../utils/response');
 
 /** Shopper-facing error mapping — never expose credit/key problems to shoppers. */
@@ -54,20 +56,10 @@ const tryon = asyncHandler(async (req, res) => {
 
   const settings = await Settings.findOne().lean();
   const maxBytes = Number(settings?.tryonMaxUploadBytes || 6000000);
-  const dailyLimit = Number(settings?.tryonDailyLimit || 5);
 
   // base64 length is ~1.37x the byte size; guard generously at 1.4x.
   if (userImage && userImage.length > maxBytes * 1.4) {
     return fail(res, 'That photo is too large. Please use a smaller image.', 400);
-  }
-
-  // Per-user daily limit (credits = money).
-  const since = new Date(Date.now() - 24 * 3600 * 1000);
-  const count = await TryOnJob.countDocuments({ userId: req.user.id, createdAt: { $gte: since } });
-  if (count >= dailyLimit) {
-    return fail(res, "You've reached today's try-on limit. Please try again tomorrow.", 429, {
-      error: 'daily_try_on_limit_reached',
-    });
   }
 
   const product = await Product.findById(productId).lean();
@@ -75,13 +67,16 @@ const tryon = asyncHandler(async (req, res) => {
     return fail(res, 'This product is not available for try-on.', 404);
   }
 
+  // Prepare the product image + the "person" image BEFORE spending a credit, so
+  // a prep failure never charges the shopper.
+  let productImage;
+  let personImage = userImage;
   try {
     // Look the product image up server-side — never trust the client for this.
-    const productImage = await bs.urlToB64(product.Thumbnail || (product.Images || [])[0]);
+    productImage = await bs.urlToB64(product.Thumbnail || (product.Images || [])[0]);
 
     // The "person" is either the shopper's uploaded photo or a preset model
     // (we fetch the chosen model's image server-side and use it as the photo).
-    let personImage = userImage;
     if (!personImage && modelId) {
       const allModels = await bs.getModels('photoshoot');
       const chosen = (allModels || []).find((m) => String(m.id) === String(modelId));
@@ -90,7 +85,19 @@ const tryon = asyncHandler(async (req, res) => {
       }
       personImage = await bs.urlToB64(chosen.imageFullUrl);
     }
+  } catch (e) {
+    return handleBsError(e, res);
+  }
 
+  // Each try-on spends 1 credit (= money). Deduct atomically FIRST so a burst of
+  // concurrent requests can never double-spend the same credit; refund below if
+  // the job fails to start.
+  const balanceAfter = await credits.deductOneCredit(req.user.id);
+  if (balanceAfter === null) {
+    return fail(res, "You're out of try-on credits.", 402, { error: 'out_of_credits' });
+  }
+
+  try {
     const job = await bs.startTryOn({ productImage, userImage: personImage, categoryId: 'Cloths' });
 
     await TryOnJob.create({
@@ -99,10 +106,29 @@ const tryon = asyncHandler(async (req, res) => {
       brandshootJobId: job.jobId,
     });
 
-    return ok(res, { jobId: job.jobId, totalImages: job.totalImages }, 'Try-on started');
+    await credits.logTryonConsume({
+      userId: req.user.id,
+      jobId: job.jobId,
+      balanceAfter,
+      feature: 'tryon',
+    });
+
+    return ok(
+      res,
+      { jobId: job.jobId, totalImages: job.totalImages, credits: balanceAfter },
+      'Try-on started'
+    );
   } catch (e) {
+    // The job never started — give the credit back before reporting the error.
+    await credits.refundOneCredit({ userId: req.user.id, feature: 'tryon', reason: 'start_failed' });
     return handleBsError(e, res);
   }
+});
+
+// GET /api/ai/tryon/credits — the signed-in shopper's remaining try-on credits.
+const balance = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id).select('tryonCredits').lean();
+  return ok(res, { credits: user ? user.tryonCredits || 0 : 0 }, 'Credits');
 });
 
 // GET /api/ai/jobs/:jobId  — only the owner can poll their own job.
@@ -170,4 +196,4 @@ const history = asyncHandler(async (req, res) => {
   return ok(res, { total: items.length, items }, 'Try-on history');
 });
 
-module.exports = { tryon, getJob, models, history };
+module.exports = { tryon, getJob, models, history, balance };

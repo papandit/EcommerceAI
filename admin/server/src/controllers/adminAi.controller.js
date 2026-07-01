@@ -1,6 +1,7 @@
 const bs = require('../services/brandshoot');
 const Product = require('../models/product.model');
 const AiJob = require('../models/aiJob.model');
+const credits = require('../utils/credits');
 const { processAndSave } = require('../middleware/upload');
 const { ok, fail, asyncHandler } = require('../utils/response');
 
@@ -76,6 +77,13 @@ const photoshoot = asyncHandler(async (req, res) => {
       totalImages: job.totalImages,
       createdBy: req.user.id,
     });
+    // Admin generations draw from the same BrandShoot credit pool as try-ons.
+    await credits.recordPoolConsume({
+      amount: job.totalImages,
+      feature: 'photoshoot',
+      jobId: job.jobId,
+      createdBy: req.user.id,
+    });
     return ok(
       res,
       { jobId: job.jobId, totalImages: job.totalImages, scenarios: job.scenarios, _id: doc._id },
@@ -116,6 +124,13 @@ const catalog = asyncHandler(async (req, res) => {
       feature: 'catalog',
       brandshootJobId: job.jobId,
       totalImages: job.totalImages,
+      createdBy: req.user.id,
+    });
+    // Admin generations draw from the same BrandShoot credit pool as try-ons.
+    await credits.recordPoolConsume({
+      amount: job.totalImages,
+      feature: 'catalog',
+      jobId: job.jobId,
       createdBy: req.user.id,
     });
     return ok(

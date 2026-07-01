@@ -25,8 +25,16 @@ const settingsSchema = new mongoose.Schema(
     // the client-facing GET /settings (see settings.controller.js).
     brandshootBase: { type: String, default: 'https://brandshoot.onewebmart.cloud' },
     brandshootKey: { type: String, default: '' },
-    tryonDailyLimit: { type: Number, default: 5 },
+    tryonDailyLimit: { type: Number, default: 5 }, // legacy — no longer enforced (credits gate try-on)
     tryonMaxUploadBytes: { type: Number, default: 6000000 },
+    // Try-on credit pool + costing. The admin buys credits from BrandShoot and
+    // records the running total here; `costPerCredit` (in `currency`) lets the
+    // costing dashboard estimate spend. `signupFreeCredits` is granted to each
+    // new user on signup. Consumption is tracked in the CreditLedger.
+    purchasedCredits: { type: Number, default: 0 },
+    costPerCredit: { type: Number, default: 0 },
+    currency: { type: String, default: 'INR' },
+    signupFreeCredits: { type: Number, default: 3 },
   },
   baseSchemaOptions
 );

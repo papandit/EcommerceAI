@@ -8,6 +8,7 @@ const ctrl = require('../controllers/aiTryon.controller');
 router.use(express.json({ limit: '12mb' }));
 
 router.get('/models', auth, ctrl.models);
+router.get('/tryon/credits', auth, ctrl.balance);
 router.get('/tryon/history', auth, ctrl.history);
 router.post('/tryon', auth, ctrl.tryon);
 router.get('/jobs/:jobId', auth, ctrl.getJob);

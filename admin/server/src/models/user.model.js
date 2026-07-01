@@ -21,6 +21,14 @@ const userSchema = new mongoose.Schema(
     Verifyotp: { type: Boolean, default: false },
     status: { type: String, default: 'active' },
 
+    // AI try-on credits. Each try-on spends 1 credit (= real BrandShoot money).
+    // `tryonCredits` is the live spendable balance; the two totals are an audit
+    // trail. New users are granted `Settings.signupFreeCredits` on signup, and
+    // admins can adjust balances from the panel (see utils/credits.js).
+    tryonCredits: { type: Number, default: 0, min: 0 },
+    creditsGrantedTotal: { type: Number, default: 0 }, // lifetime granted
+    creditsConsumedTotal: { type: Number, default: 0 }, // lifetime consumed
+
     // Storefront keeps references to the user's cart/wishlist/address docs.
     Cartid: { type: String, default: '' },
     Wishlistid: { type: String, default: '' },

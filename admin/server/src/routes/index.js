@@ -45,6 +45,8 @@ router.use('/payments', require('./payment.routes'));
 // BrandShoot AI: customer try-on (/api/ai) + admin photoshoot/catalog (/api/admin/ai)
 router.use('/ai', require('./aiTryon.routes'));
 router.use('/admin/ai', require('./adminAi.routes'));
+// Try-on credits: costing summary + per-user grant/adjust (admin only)
+router.use('/admin/credits', require('./credit.routes'));
 
 // Images (media library): list by category, delete. Records are created on upload.
 (() => {

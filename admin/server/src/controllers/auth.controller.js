@@ -4,6 +4,7 @@ const { ok, created, fail, asyncHandler } = require('../utils/response');
 const { issueTokens, verifyRefreshToken } = require('../utils/jwt');
 const { verifyIdToken } = require('../config/firebaseAdmin');
 const { sendMail } = require('../utils/mailer');
+const { grantSignupCredits } = require('../utils/credits');
 
 function genOtp() {
   return String(Math.floor(100000 + Math.random() * 900000)); // 6 digits
@@ -27,7 +28,7 @@ const register = asyncHandler(async (req, res) => {
   if (exists) return fail(res, 'An account with this email already exists.', 409);
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await User.create({
+  let user = await User.create({
     Email: email,
     passwordHash,
     FirstName: b.firstName || b.FirstName || b.name || b.Name || '',
@@ -38,6 +39,9 @@ const register = asyncHandler(async (req, res) => {
     authProvider: 'local',
     Verifyotp: true,
   });
+
+  // Free try-on credits for the new account (configurable in Settings).
+  user = await grantSignupCredits(user);
 
   const tokens = issueTokens(user);
   return created(res, { ...tokens, user: publicUser(user) }, 'Registered');
@@ -86,6 +90,8 @@ const googleLogin = asyncHandler(async (req, res) => {
       firebaseUid: decoded.uid || '',
       Verifyotp: true,
     });
+    // Free try-on credits for the new account (only on first creation).
+    user = await grantSignupCredits(user);
   } else if (!user.firebaseUid && decoded.uid) {
     user.firebaseUid = decoded.uid;
     user.authProvider = user.authProvider || 'google';
