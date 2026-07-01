@@ -46,11 +46,29 @@ class _TryOnPageState extends State<TryOnPage> {
   String? _selectedModelId;
   bool _modelsLoading = false;
 
+  // Remaining try-on credits for the signed-in shopper (null = unknown/not
+  // signed in). Each try-on costs 1 credit; at 0 the Generate button is blocked.
+  int? _credits;
+
   @override
   void initState() {
     super.initState();
     _loadModels();
+    _loadCredits();
   }
+
+  Future<void> _loadCredits() async {
+    if (!ApiClient.instance.hasToken) return; // credits require auth
+    try {
+      final data = await ApiClient.instance.getOne('/ai/tryon/credits');
+      if (!mounted) return;
+      setState(() => _credits = (data['credits'] as num?)?.toInt());
+    } catch (_) {
+      // non-fatal — badge just stays hidden
+    }
+  }
+
+  bool get _outOfCredits => _credits != null && _credits! <= 0;
 
   Future<void> _loadModels() async {
     if (!ApiClient.instance.hasToken) return; // models endpoint requires auth
@@ -129,9 +147,19 @@ class _TryOnPageState extends State<TryOnPage> {
         _fail('Could not start try-on. Please try again.');
         return;
       }
+      // The backend deducts 1 credit on start and returns the new balance.
+      final remaining = (res['credits'] as num?)?.toInt();
+      if (remaining != null) _credits = remaining;
       await _poll(jobId);
     } on ApiException catch (e) {
-      _fail(e.message);
+      // 402 = out of try-on credits. Nothing was charged (we deduct before the
+      // job starts), so show a distinct, non-retryable message.
+      if (e.statusCode == 402) {
+        setState(() => _credits = 0);
+        _fail("You're out of try-on credits.");
+      } else {
+        _fail(e.message);
+      }
     } catch (_) {
       _fail('Network error. Please check your connection.');
     } finally {
@@ -377,10 +405,18 @@ class _TryOnPageState extends State<TryOnPage> {
             ],
           ),
           _modelPicker(),
+          if (_credits != null) ...[
+            const SizedBox(height: 14),
+            _creditsBadge(),
+          ],
           const SizedBox(height: 14),
           _primaryBtn(
-            label: _hasPerson ? 'Generate try-on' : 'Add a photo or pick a model',
-            enabled: _hasPerson,
+            label: _outOfCredits
+                ? "You're out of try-on credits"
+                : (_hasPerson
+                    ? 'Generate try-on'
+                    : 'Add a photo or pick a model'),
+            enabled: _hasPerson && !_outOfCredits,
             onTap: _generate,
           ),
           const SizedBox(height: 12),
@@ -493,6 +529,40 @@ class _TryOnPageState extends State<TryOnPage> {
                   ),
                 );
               },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _creditsBadge() {
+    final out = _outOfCredits;
+    final n = _credits ?? 0;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: out ? const Color(0xFFFCEBEB) : AppColor.blush,
+        borderRadius: AppRadius.sm,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(out ? Icons.info_outline : Icons.auto_awesome,
+              size: 16, color: out ? const Color(0xFFC0392B) : AppColor.primary),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              out
+                  ? 'No try-on credits left. Please contact us for more.'
+                  : (n == 1
+                      ? '1 try-on credit left'
+                      : '$n try-on credits left'),
+              style: TextStyle(
+                color: out ? const Color(0xFFC0392B) : AppColor.primaryDark,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
