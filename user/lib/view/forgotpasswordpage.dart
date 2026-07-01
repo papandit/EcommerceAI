@@ -1,6 +1,8 @@
-// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:EcommerceApp/helper/api/api_client.dart';
+import 'package:EcommerceApp/helper/auth_shell.dart';
+import 'package:EcommerceApp/helper/risponsive.dart';
 import 'package:EcommerceApp/helper/utillity.dart';
 import 'package:EcommerceApp/helper/webnavigation.dart';
 import 'package:EcommerceApp/view/loginpage.dart';
@@ -37,6 +39,9 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
   bool _validEmail(String s) =>
       RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(s.trim());
 
+  void _backToLogin() => WebAPPNavigation.navigateToroute(
+      context: context, routename: '/LoginPage', screen: LoginPage());
+
   Future<void> _sendOtp() async {
     final email = _email.text.trim();
     if (!_validEmail(email)) {
@@ -45,8 +50,8 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
     }
     setState(() => _busy = true);
     try {
-      final res =
-          await ApiClient.instance.post('/auth/forgot-password', {'email': email});
+      final res = await ApiClient.instance
+          .post('/auth/forgot-password', {'email': email});
       final devOtp = (res['devOtp'] ?? '').toString();
       setState(() => _step = 1);
       AppToast.show(
@@ -89,8 +94,7 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
         'newPassword': pass,
       });
       AppToast.show(context, 'Password reset! Please sign in.', success: true);
-      WebAPPNavigation.navigateToroute(
-          context: context, routename: '/LoginPage', screen: LoginPage());
+      _backToLogin();
     } on ApiException catch (e) {
       AppToast.show(context, e.message, success: false);
     } catch (_) {
@@ -104,143 +108,107 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.cream,
-      appBar: AppBar(
-        backgroundColor: AppColor.cream,
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColor.ink),
-          onPressed: () => WebAPPNavigation.navigateTo(context: context),
-        ),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppColor.whiteColor,
-                borderRadius: AppRadius.lg,
-                border: Appborder.appborder,
-                boxShadow: Appshadow.soft,
-              ),
-              child: _step == 0 ? _emailStep() : _resetStep(),
-            ),
+      body: AuthShell(
+        maxFormWidth: 440,
+        leading: Responsive.isMobile(context)
+            ? Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  alignment: Alignment.centerLeft,
+                  onPressed: _backToLogin,
+                  icon: Icon(Icons.arrow_back, color: AppColor.ink),
+                ),
+              )
+            : null,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(36, 40, 36, 36),
+          decoration: BoxDecoration(
+            color: AppColor.whiteColor,
+            borderRadius: BorderRadius.circular(22),
+            boxShadow: [
+              BoxShadow(
+                  color: const Color(0xff781E3C).withValues(alpha: 0.14),
+                  blurRadius: 60,
+                  offset: const Offset(0, 30))
+            ],
           ),
+          child: _step == 0 ? _emailStep() : _resetStep(),
         ),
-      ),
-    );
-  }
-
-  Widget _title(String t, String sub) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(t,
-              style: TextStyle(
-                  fontFamily: AppFont.heading,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: AppColor.ink)),
-          const SizedBox(height: 6),
-          Text(sub,
-              style: TextStyle(color: AppColor.fontColorgrey, fontSize: 13.5)),
-          const SizedBox(height: 20),
-        ],
-      );
-
-  Widget _field(String label, TextEditingController c,
-      {bool obscure = false, TextInputType? kb}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label,
-              style: TextStyle(
-                  color: AppColor.ink,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          TextField(
-            controller: c,
-            obscureText: obscure,
-            keyboardType: kb,
-            cursorColor: AppColor.primary,
-            decoration: InputDecoration(
-              isDense: true,
-              filled: true,
-              fillColor: AppColor.blush,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-              border: OutlineInputBorder(
-                  borderRadius: AppRadius.sm, borderSide: BorderSide.none),
-            ),
-          ),
-        ],
       ),
     );
   }
 
   Widget _emailStep() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _title('Forgot password?',
-            'Enter your account email and we\'ll send you a reset code.'),
-        _field('Email', _email, kb: TextInputType.emailAddress),
-        const SizedBox(height: 6),
-        _primary('Send code', _sendOtp),
+        const AuthTitle('Forgot password?', fontSize: 30, align: TextAlign.left),
+        const SizedBox(height: 10),
+        Text(
+          "Enter your account email and we'll send you a reset code.",
+          style: TextStyle(
+              color: const Color(0xff8C8792), fontSize: 15, height: 1.55),
+        ),
+        const SizedBox(height: 26),
+        AuthField(
+          label: 'Email',
+          controller: _email,
+          hint: 'you@example.com',
+          keyboardType: TextInputType.emailAddress,
+        ),
+        AuthPrimaryButton(label: 'Send code', busy: _busy, onTap: _sendOtp, topMargin: 8),
+        AuthFooterLink(
+          text: '',
+          actionLabel: '← Back to login',
+          onTap: _backToLogin,
+          topMargin: 20,
+        ),
       ],
     );
   }
 
   Widget _resetStep() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _title('Reset password',
-            'Enter the code sent to ${_email.text.trim()} and choose a new password.'),
-        _field('Reset code', _otp, kb: TextInputType.number),
-        _field('New password', _pass, obscure: true),
-        _field('Confirm new password', _confirm, obscure: true),
-        const SizedBox(height: 6),
-        _primary('Reset password', _resetPassword),
+        const AuthTitle('Reset password', fontSize: 30, align: TextAlign.left),
         const SizedBox(height: 10),
-        Center(
-          child: TextButton(
-            onPressed: _busy ? null : _sendOtp,
-            child: Text('Resend code',
-                style: TextStyle(color: AppColor.primary)),
-          ),
+        Text(
+          'Enter the code sent to ${_email.text.trim()} and choose a new password.',
+          style: TextStyle(
+              color: const Color(0xff8C8792), fontSize: 15, height: 1.55),
+        ),
+        const SizedBox(height: 26),
+        AuthField(
+          label: 'Reset code',
+          controller: _otp,
+          hint: '6-digit code',
+          keyboardType: TextInputType.number,
+        ),
+        AuthField(
+          label: 'New password',
+          controller: _pass,
+          hint: 'At least 6 characters',
+          obscure: true,
+        ),
+        AuthField(
+          label: 'Confirm new password',
+          controller: _confirm,
+          hint: 'Re-enter your password',
+          obscure: true,
+        ),
+        AuthPrimaryButton(
+            label: 'Reset password', busy: _busy, onTap: _resetPassword, topMargin: 8),
+        AuthFooterLink(
+          text: "Didn't get the code?",
+          actionLabel: 'Resend',
+          onTap: () {
+            if (!_busy) _sendOtp();
+          },
+          topMargin: 18,
         ),
       ],
-    );
-  }
-
-  Widget _primary(String label, VoidCallback onTap) {
-    return PressableScale(
-      onTap: _busy ? () {} : onTap,
-      child: Container(
-        height: 52,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          gradient: _busy ? null : AppColor.ctaGradient,
-          color: _busy ? AppColor.dividercolor : null,
-          borderRadius: AppRadius.sm,
-        ),
-        child: _busy
-            ? SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, color: AppColor.primary))
-            : Text(label,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600)),
-      ),
     );
   }
 }
