@@ -1626,8 +1626,6 @@ class CommonWidget extends StatefulWidget {
           SizedBox(height: 26),
           _footerLinkColumns(context),
           SizedBox(height: 24),
-          _footerGetInTouch(context),
-          SizedBox(height: 10),
           socialmedia(context),
           SizedBox(height: 22),
           Divider(
@@ -1674,8 +1672,9 @@ class CommonWidget extends StatefulWidget {
     );
   }
 
-  // ---- "Get In Touch" block (email + phone numbers) shown in the footer ----
-  Widget _footerGetInTouch(BuildContext context) {
+  // ---- "Get In Touch" contact lines (email + phone) — rendered as a footer
+  // column beside "Company" (see _footerLinkColumns). ----
+  List<Widget> _footerContactLines(BuildContext context) {
     Widget contactLine(String text, String url, IconData icon) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -1686,12 +1685,14 @@ class CommonWidget extends StatefulWidget {
             children: [
               Icon(icon, size: 17, color: AppColor.accent),
               SizedBox(width: 10),
-              Text(
-                text,
-                style: TextStyle(
-                    color: AppColor.accent,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w500),
+              Flexible(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                      color: AppColor.accent,
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w500),
+                ),
               ),
             ],
           ),
@@ -1699,29 +1700,12 @@ class CommonWidget extends StatefulWidget {
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Get In Touch",
-            style: TextStyle(
-                fontFamily: AppFont.heading,
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: AppColor.whiteColor),
-          ),
-          SizedBox(height: 16),
-          contactLine("business@onewebmart.com",
-              "mailto:business@onewebmart.com", Icons.mail_outline),
-          contactLine(
-              "+91 9033806717", "tel:+919033806717", Icons.call_outlined),
-          contactLine(
-              "+91 9408307302", "tel:+919408307302", Icons.call_outlined),
-        ],
-      ),
-    );
+    return [
+      contactLine("business@onewebmart.com",
+          "mailto:business@onewebmart.com", Icons.mail_outline),
+      contactLine("+91 9033806717", "tel:+919033806717", Icons.call_outlined),
+      contactLine("+91 9408307302", "tel:+919408307302", Icons.call_outlined),
+    ];
   }
 
   // Store brand name shown in the footer / copyright. Change this in one place.
@@ -1807,6 +1791,7 @@ class CommonWidget extends StatefulWidget {
       _footerColumn(context, "Shop by Category", categoryLinks),
       _footerColumn(context, "Customer Service", serviceLinks),
       _footerColumn(context, "Company", companyLinks),
+      _footerColumn(context, "Get In Touch", _footerContactLines(context)),
     ];
 
     return Padding(
@@ -1815,12 +1800,12 @@ class CommonWidget extends StatefulWidget {
         constraints: const BoxConstraints(maxWidth: 1180),
         child: Wrap(
           alignment: WrapAlignment.spaceBetween,
-          spacing: 40,
+          spacing: 32,
           runSpacing: 30,
           children: columns
               .map((c) => SizedBox(
                   width: wide
-                      ? 300
+                      ? 250
                       : (MediaQuery.of(context).size.width - 70) / 2,
                   child: c))
               .toList(),
