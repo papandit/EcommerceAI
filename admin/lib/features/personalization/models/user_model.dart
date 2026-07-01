@@ -20,6 +20,7 @@ class UserModel {
   List<OrderModel>? orders;
   List<AddressModel>? addresses;
   String? devicetoken;
+  int tryonCredits;
 
   /// Constructor for UserModel.
   UserModel(
@@ -33,7 +34,8 @@ class UserModel {
       this.role = AppRole.user,
       this.createdAt,
       this.updatedAt,
-      this.devicetoken});
+      this.devicetoken,
+      this.tryonCredits = 0});
 
   /// Helper methods
   String get fullName => '$firstName $lastName';
@@ -83,6 +85,8 @@ class UserModel {
           : AppRole.user,
       createdAt: _date(data['CreatedAt'] ?? data['createdAt']) ?? DateTime.now(),
       updatedAt: _date(data['UpdatedAt'] ?? data['updatedAt']) ?? DateTime.now(),
+      tryonCredits:
+          (num.tryParse((data['tryonCredits'] ?? 0).toString()) ?? 0).toInt(),
     );
   }
 

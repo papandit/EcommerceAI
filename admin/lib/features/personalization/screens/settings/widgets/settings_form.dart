@@ -242,28 +242,72 @@ class SettingsForm extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: TSizes.spaceBtwInputFields),
+                TextFormField(
+                  controller: controller.tryonMaxUploadBytesController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    hintText: '6000000',
+                    label: Text('Max upload (bytes)'),
+                    prefixIcon: Icon(Iconsax.gallery),
+                  ),
+                ),
+                const SizedBox(height: TSizes.spaceBtwSections),
+
+                // Try-On Credits — the pool the admin buys from BrandShoot, its
+                // cost, and the free credits each new shopper gets on signup.
+                Text('Try-On Credits',
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: TSizes.spaceBtwInputFields),
                 Row(
                   children: [
                     Expanded(
                       child: TextFormField(
-                        controller: controller.tryonDailyLimitController,
+                        controller: controller.purchasedCreditsController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                          hintText: '5',
-                          label: Text('Try-on / user / day'),
-                          prefixIcon: Icon(Iconsax.user_tick),
+                          hintText: '0',
+                          label: Text('Purchased Credits'),
+                          prefixIcon: Icon(Iconsax.coin),
+                          helperText: 'Total credits bought from BrandShoot',
                         ),
                       ),
                     ),
                     const SizedBox(width: TSizes.spaceBtwItems),
                     Expanded(
                       child: TextFormField(
-                        controller: controller.tryonMaxUploadBytesController,
+                        controller: controller.costPerCreditController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                          hintText: '6000000',
-                          label: Text('Max upload (bytes)'),
-                          prefixIcon: Icon(Iconsax.gallery),
+                          hintText: '0.0',
+                          label: Text('Cost / Credit'),
+                          prefixIcon: Icon(Iconsax.money),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: TSizes.spaceBtwInputFields),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: controller.currencyController,
+                        decoration: const InputDecoration(
+                          hintText: 'INR',
+                          label: Text('Currency'),
+                          prefixIcon: Icon(Iconsax.dollar_circle),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: TSizes.spaceBtwItems),
+                    Expanded(
+                      child: TextFormField(
+                        controller: controller.signupFreeCreditsController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          hintText: '3',
+                          label: Text('Free Credits on Signup'),
+                          prefixIcon: Icon(Iconsax.gift),
                         ),
                       ),
                     ),

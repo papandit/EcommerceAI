@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../../../../../common/widgets/breadcrumbs/breadcrumb_with_heading.dart';
 import '../../../../../../routes/routes.dart';
 import '../../../../../../utils/constants/sizes.dart';
+import '../widgets/customer_credits.dart';
 import '../widgets/customer_info.dart';
 import '../widgets/customer_orders.dart';
 import '../widgets/shipping_address.dart';
@@ -44,6 +45,10 @@ class CustomerDetailDesktopScreen extends StatelessWidget {
                       children: [
                         // Customer Info
                         CustomerInfo(customer: customer),
+                        const SizedBox(height: TSizes.spaceBtwSections),
+
+                        // Try-On Credits (balance + adjust + history)
+                        CustomerCredits(customer: customer),
                         const SizedBox(height: TSizes.spaceBtwSections),
 
                         // Shipping Address

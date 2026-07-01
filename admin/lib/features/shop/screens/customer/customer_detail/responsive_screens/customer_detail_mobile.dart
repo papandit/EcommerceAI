@@ -6,6 +6,7 @@ import '../../../../../../routes/routes.dart';
 import '../../../../../../utils/constants/sizes.dart';
 import '../../../../../personalization/models/user_model.dart';
 import '../../../../controllers/customer/customer_detail_controller.dart';
+import '../widgets/customer_credits.dart';
 import '../widgets/customer_info.dart';
 import '../widgets/customer_orders.dart';
 import '../widgets/shipping_address.dart';
@@ -33,6 +34,10 @@ class CustomerDetailMobileScreen extends StatelessWidget {
 
               // Customer Info
               CustomerInfo(customer: customer),
+              const SizedBox(height: TSizes.spaceBtwSections),
+
+              // Try-On Credits
+              CustomerCredits(customer: customer),
               const SizedBox(height: TSizes.spaceBtwSections),
 
               // Shipping Address

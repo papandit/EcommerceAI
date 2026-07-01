@@ -26,6 +26,11 @@ class SettingsModel {
   bool brandshootConfigured;
   int tryonDailyLimit;
   int tryonMaxUploadBytes;
+  // Try-on credit pool + costing (see credit costing dashboard).
+  int purchasedCredits;
+  double costPerCredit;
+  String currency;
+  int signupFreeCredits;
 
   /// Constructor for SettingModel.
   SettingsModel({
@@ -51,6 +56,10 @@ class SettingsModel {
     this.brandshootConfigured = false,
     this.tryonDailyLimit = 5,
     this.tryonMaxUploadBytes = 6000000,
+    this.purchasedCredits = 0,
+    this.costPerCredit = 0.0,
+    this.currency = 'INR',
+    this.signupFreeCredits = 3,
   });
 
   /// Convert model to JSON structure for storing data in Firebase.
@@ -76,6 +85,10 @@ class SettingsModel {
       'brandshootKey': brandshootKey,
       'tryonDailyLimit': tryonDailyLimit,
       'tryonMaxUploadBytes': tryonMaxUploadBytes,
+      'purchasedCredits': purchasedCredits,
+      'costPerCredit': costPerCredit,
+      'currency': currency,
+      'signupFreeCredits': signupFreeCredits,
     };
   }
 
@@ -109,6 +122,13 @@ class SettingsModel {
           (num.tryParse((data['tryonMaxUploadBytes'] ?? 6000000).toString()) ??
                   6000000)
               .toInt(),
+      purchasedCredits:
+          (num.tryParse((data['purchasedCredits'] ?? 0).toString()) ?? 0).toInt(),
+      costPerCredit:
+          (num.tryParse((data['costPerCredit'] ?? 0).toString()) ?? 0).toDouble(),
+      currency: (data['currency'] ?? 'INR').toString(),
+      signupFreeCredits:
+          (num.tryParse((data['signupFreeCredits'] ?? 3).toString()) ?? 3).toInt(),
     );
   }
 

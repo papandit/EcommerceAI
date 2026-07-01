@@ -8,6 +8,7 @@ import '../../../utils/popups/full_screen_loader.dart';
 import '../../../utils/popups/loaders.dart';
 import '../../media/controllers/media_controller.dart';
 import '../../media/models/image_model.dart';
+import 'credit_controller.dart';
 
 class SettingsController extends GetxController {
   static SettingsController get instance => Get.find();
@@ -36,6 +37,10 @@ class SettingsController extends GetxController {
   final brandshootKeyController = TextEditingController();
   final tryonDailyLimitController = TextEditingController();
   final tryonMaxUploadBytesController = TextEditingController();
+  final purchasedCreditsController = TextEditingController();
+  final costPerCreditController = TextEditingController();
+  final currencyController = TextEditingController();
+  final signupFreeCreditsController = TextEditingController();
 
   // Dependencies
   final settingRepository = Get.put(SettingsRepository());
@@ -77,6 +82,10 @@ class SettingsController extends GetxController {
       tryonDailyLimitController.text = settings.tryonDailyLimit.toString();
       tryonMaxUploadBytesController.text =
           settings.tryonMaxUploadBytes.toString();
+      purchasedCreditsController.text = settings.purchasedCredits.toString();
+      costPerCreditController.text = settings.costPerCredit.toString();
+      currencyController.text = settings.currency;
+      signupFreeCreditsController.text = settings.signupFreeCredits.toString();
 
       loading.value = false;
 
@@ -162,6 +171,15 @@ class SettingsController extends GetxController {
           int.tryParse(tryonDailyLimitController.text.trim()) ?? 5;
       settings.value.tryonMaxUploadBytes =
           int.tryParse(tryonMaxUploadBytesController.text.trim()) ?? 6000000;
+      settings.value.purchasedCredits =
+          int.tryParse(purchasedCreditsController.text.trim()) ?? 0;
+      settings.value.costPerCredit =
+          double.tryParse(costPerCreditController.text.trim()) ?? 0.0;
+      settings.value.currency = currencyController.text.trim().isEmpty
+          ? 'INR'
+          : currencyController.text.trim();
+      settings.value.signupFreeCredits =
+          int.tryParse(signupFreeCreditsController.text.trim()) ?? 0;
 
       print(settings.value);
       await settingRepository.updateSettingDetails(settings.value);
@@ -175,6 +193,10 @@ class SettingsController extends GetxController {
       settings.refresh();
 
       loading.value = false;
+      // Reflect any change to purchased credits / cost in the costing dashboard.
+      if (Get.isRegistered<CreditController>()) {
+        CreditController.instance.fetchSummary();
+      }
       TLoaders.successSnackBar(
           title: 'Congratulations', message: 'App Settings has been updated.');
     } catch (e) {

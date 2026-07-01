@@ -2,6 +2,7 @@ import 'package:cwt_ecommerce_admin_panel/common/widgets/breadcrumbs/breadcrumb_
 import 'package:flutter/material.dart';
 
 import '../../../../../../utils/constants/sizes.dart';
+import '../widgets/credit_costing_dashboard.dart';
 import '../widgets/image_meta.dart';
 import '../widgets/settings_form.dart';
 
@@ -25,8 +26,16 @@ class SettingsDesktopScreen extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Profile Pic and Meta
-                  Expanded(child: ImageAndMeta()),
+                  // Profile Pic and Meta + credit costing dashboard
+                  Expanded(
+                    child: Column(
+                      children: [
+                        ImageAndMeta(),
+                        SizedBox(height: TSizes.spaceBtwSections),
+                        CreditCostingDashboard(),
+                      ],
+                    ),
+                  ),
                   SizedBox(width: TSizes.spaceBtwSections),
 
                   // Form
