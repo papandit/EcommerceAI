@@ -954,7 +954,7 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  // Auto-sliding "Just For You" product carousel — slides one card at a time.
+  // "Just For You" product carousel — manual swipe (auto-scroll disabled).
   Widget AutoSlideCards() {
     final List<ProductModel> list =
         (alldata.isNotEmpty ? alldata : Trendings).take(10).toList();
@@ -981,10 +981,8 @@ class _HomePageState extends State<HomePage>
           options: CarouselOptions(
             height: Responsive.isMobile(context) ? 320 : 420,
             viewportFraction: vf,
-            autoPlay: true,
+            autoPlay: false, // stopped auto-scrolling — manual swipe only
             enableInfiniteScroll: false,
-            autoPlayInterval: const Duration(seconds: 2),
-            autoPlayAnimationDuration: const Duration(milliseconds: 700),
             enlargeCenterPage: false,
             padEnds: false,
             scrollPhysics: const BouncingScrollPhysics(),
@@ -2726,9 +2724,9 @@ class _HomePageState extends State<HomePage>
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   )))
               : Container(
-                  height: Responsive.isMobile(context) ? 300 : 450,
+                  height: Responsive.isMobile(context) ? 300 : 430,
                   width: MediaQuery.of(context).size.width,
-                  margin: EdgeInsets.only(bottom: 20, top: 15),
+                  margin: EdgeInsets.only(bottom: 20),
                   child:
 
                       // homecontoller.isLoaderintrested
@@ -2779,13 +2777,14 @@ class _HomePageState extends State<HomePage>
                           },
                           child: Container(
                             width: Responsive.isMobile(context) ? 180 : 300,
+                            clipBehavior: Clip.antiAlias,
                             decoration: BoxDecoration(
                                 color: AppColor.whiteColor,
                                 border: Appborder.appborder,
                                 boxShadow: [Appshadow.shadow],
                                 borderRadius: BorderRadius.circular(15)),
                             child: Padding(
-                              padding: EdgeInsets.all(8.0),
+                              padding: EdgeInsets.zero,
                               child: Column(
                                 children: [
                                   Flexible(
@@ -2801,10 +2800,7 @@ class _HomePageState extends State<HomePage>
                                               decoration: BoxDecoration(
                                                   image: DecorationImage(
                                                       image: imageProvider,
-                                                      fit: BoxFit.cover),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
+                                                      fit: BoxFit.cover)),
                                             );
                                           },
                                           imageUrl:
