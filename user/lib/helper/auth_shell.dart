@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -73,6 +74,31 @@ class AuthBrandPanel extends StatefulWidget {
 class _AuthBrandPanelState extends State<AuthBrandPanel>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c;
+  Timer? _timer;
+  int _slide = 0;
+
+  // Rotating brand slides — each has its own headline, blurb and illustration
+  // "props" (a pill label + glyphs), so the panel cycles through visibly
+  // different compositions.
+  static const List<_Slide> _slides = [
+    _Slide(
+      title: 'Everything you love,\nin one place.',
+      subtitle:
+          'Discover curated collections, exclusive drops and a checkout that just works.',
+      art: _SlideArt(pill: '–40%', bigGlyph: '%', leftGlyph: null, rightGlyph: '★'),
+    ),
+    _Slide(
+      title: 'Festive fits,\nready to twirl.',
+      subtitle:
+          'Shop Navratri chaniya cholis and ethnic edits made for every celebration.',
+      art: _SlideArt(pill: 'NEW', bigGlyph: '✦', leftGlyph: '♥', rightGlyph: '★'),
+    ),
+    _Slide(
+      title: 'Try it on,\nbefore you buy.',
+      subtitle: 'See any outfit on you with AI try-on — no fitting room needed.',
+      art: _SlideArt(pill: 'TRY-ON', bigGlyph: '♥', leftGlyph: '★', rightGlyph: '✦'),
+    ),
+  ];
 
   @override
   void initState() {
@@ -80,10 +106,25 @@ class _AuthBrandPanelState extends State<AuthBrandPanel>
     _c = AnimationController(
         vsync: this, duration: const Duration(seconds: 6))
       ..repeat(reverse: true);
+    _startAutoPlay();
+  }
+
+  void _startAutoPlay() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!mounted) return;
+      setState(() => _slide = (_slide + 1) % _slides.length);
+    });
+  }
+
+  void _goTo(int i) {
+    setState(() => _slide = i);
+    _startAutoPlay(); // reset the timer after a manual tap
   }
 
   @override
   void dispose() {
+    _timer?.cancel();
     _c.dispose();
     super.dispose();
   }
@@ -103,51 +144,66 @@ class _AuthBrandPanelState extends State<AuthBrandPanel>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Logo badge
+          // Brand logo
           Container(
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(11),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.30)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                    color: const Color(0xff3C0A19).withValues(alpha: 0.25),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8)),
+              ],
             ),
-            child: Text('A',
-                style: TextStyle(
-                    fontFamily: AppFont.heading,
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800)),
+            child: Image.asset('assets/image/onewebmart_logo.png',
+                height: 30, fit: BoxFit.contain),
           ),
 
-          // Illustration
+          // Illustration — cross-fades between slides.
           Expanded(
             child: Center(
-              child: AnimatedBuilder(
-                animation: _c,
-                builder: (_, __) => _illustration(_c.value),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 550),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                child: AnimatedBuilder(
+                  key: ValueKey('art-$_slide'),
+                  animation: _c,
+                  builder: (_, __) =>
+                      _illustration(_c.value, _slides[_slide].art),
+                ),
               ),
             ),
           ),
 
-          // Headline + chips
-          Text(
-            'Everything you love,\nin one place.',
-            style: TextStyle(
-                fontFamily: AppFont.heading,
-                color: Colors.white,
-                fontSize: 36,
-                height: 1.14,
-                fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            'Discover curated collections, exclusive drops and a checkout that just works.',
-            style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.82),
-                fontSize: 15,
-                height: 1.6),
+          // Headline + blurb — cross-fades per slide.
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 450),
+            child: Column(
+              key: ValueKey('txt-$_slide'),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _slides[_slide].title,
+                  style: TextStyle(
+                      fontFamily: AppFont.heading,
+                      color: Colors.white,
+                      fontSize: 36,
+                      height: 1.14,
+                      fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  _slides[_slide].subtitle,
+                  style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.82),
+                      fontSize: 15,
+                      height: 1.6),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 22),
           Wrap(
@@ -160,13 +216,26 @@ class _AuthBrandPanelState extends State<AuthBrandPanel>
             ],
           ),
           const SizedBox(height: 26),
+          // Slide dots — tap to jump.
           Row(
             children: [
-              _dash(26, 1),
-              const SizedBox(width: 8),
-              _dash(9, 0.45),
-              const SizedBox(width: 8),
-              _dash(9, 0.45),
+              for (int i = 0; i < _slides.length; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => _goTo(i),
+                  behavior: HitTestBehavior.opaque,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: i == _slide ? 26 : 9,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.white
+                          .withValues(alpha: i == _slide ? 1 : 0.45),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ],
@@ -174,17 +243,15 @@ class _AuthBrandPanelState extends State<AuthBrandPanel>
     );
   }
 
-  Widget _dash(double w, double opacity) => Container(
-        width: w,
-        height: 5,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: opacity),
-          borderRadius: BorderRadius.circular(3),
-        ),
-      );
+  // Small white glyph shown inside a glass bag (null → empty).
+  Widget _glyph(String? g) => g == null
+      ? const SizedBox.shrink()
+      : Text(g,
+          style: const TextStyle(
+              color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800));
 
-  // t in [0,1] drives a gentle float.
-  Widget _illustration(double t) {
+  // t in [0,1] drives a gentle float; [art] swaps the pill + glyphs per slide.
+  Widget _illustration(double t, _SlideArt art) {
     final dy = math.sin(t * math.pi * 2) * 10;
     return SizedBox(
       width: 320,
@@ -225,8 +292,8 @@ class _AuthBrandPanelState extends State<AuthBrandPanel>
                         offset: const Offset(0, 10))
                   ],
                 ),
-                child: const Text('–40%',
-                    style: TextStyle(
+                child: Text(art.pill,
+                    style: const TextStyle(
                         color: Color(0xffC24C6B),
                         fontWeight: FontWeight.w800,
                         fontSize: 15)),
@@ -238,7 +305,8 @@ class _AuthBrandPanelState extends State<AuthBrandPanel>
             left: 6,
             top: 150,
             child: Transform.translate(
-                offset: Offset(0, dy), child: _glassBag(80, 92, const Icon(null))),
+                offset: Offset(0, dy),
+                child: _glassBag(80, 92, _glyph(art.leftGlyph))),
           ),
           // small glass bag (right)
           Positioned(
@@ -246,19 +314,16 @@ class _AuthBrandPanelState extends State<AuthBrandPanel>
             top: 66,
             child: Transform.translate(
               offset: Offset(0, -dy),
-              child: _glassBag(
-                  74, 86,
-                  const Text('★',
-                      style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800))),
+              child: _glassBag(74, 86, _glyph(art.rightGlyph)),
             ),
           ),
-          // big solid bag with %
+          // big solid bag with the slide's headline glyph
           Positioned(
             left: 96,
             top: 92,
             child: Transform.translate(
               offset: Offset(0, dy * 0.6),
-              child: _bigBag(),
+              child: _bigBag(art.bigGlyph),
             ),
           ),
           // sparkles
@@ -286,7 +351,7 @@ class _AuthBrandPanelState extends State<AuthBrandPanel>
     );
   }
 
-  Widget _bigBag() {
+  Widget _bigBag(String glyph) {
     return SizedBox(
       width: 130,
       height: 156,
@@ -323,7 +388,7 @@ class _AuthBrandPanelState extends State<AuthBrandPanel>
                       offset: const Offset(0, 24))
                 ],
               ),
-              child: Text('%',
+              child: Text(glyph,
                   style: TextStyle(
                       fontFamily: AppFont.heading,
                       color: const Color(0xffC24C6B),
@@ -375,6 +440,33 @@ class _AuthBrandPanelState extends State<AuthBrandPanel>
       ),
     );
   }
+}
+
+/// One rotating brand slide: headline, blurb and illustration props.
+class _Slide {
+  const _Slide({
+    required this.title,
+    required this.subtitle,
+    required this.art,
+  });
+  final String title;
+  final String subtitle;
+  final _SlideArt art;
+}
+
+/// Per-slide illustration "props" — the pill label plus the glyphs on the big
+/// card and the two glass bags. Same style, different elements each slide.
+class _SlideArt {
+  const _SlideArt({
+    required this.pill,
+    required this.bigGlyph,
+    this.leftGlyph,
+    this.rightGlyph,
+  });
+  final String pill;
+  final String bigGlyph;
+  final String? leftGlyph;
+  final String? rightGlyph;
 }
 
 class _Chip extends StatelessWidget {
