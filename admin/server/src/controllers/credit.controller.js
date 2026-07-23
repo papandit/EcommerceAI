@@ -18,7 +18,12 @@ const costingSummary = asyncHandler(async (_req, res) => {
   const costPerCredit = Number(s.costPerCredit || 0);
   const currency = s.currency || 'INR';
   const consumed = await credits.getConsumedCredits();
-  const remaining = purchased - consumed;
+
+  // If BrandShoot ever reports a live figure, trust it over the manually
+  // entered total — that is the closest thing to a real sync available.
+  const reported = s.brandshootReportedCredits;
+  const hasReported = typeof reported === 'number' && Number.isFinite(reported);
+  const remaining = hasReported ? reported : purchased - consumed;
 
   // User-side aggregates so the dashboard reflects real distribution, not just
   // the pool: how many credits are sitting in shopper balances right now, how
@@ -54,6 +59,12 @@ const costingSummary = asyncHandler(async (_req, res) => {
       usedTotal: a.usedTotal,
       avgPerUser,
       estAllocatedCost: a.allocated * costPerCredit,
+      // live BrandShoot key status (auto-synced from real API calls)
+      brandshootConfigured: !!s.brandshootKey,
+      brandshootReportedCredits: hasReported ? reported : null,
+      brandshootDepleted: !!s.brandshootDepleted,
+      brandshootCheckedAt: s.brandshootCheckedAt || null,
+      remainingIsLive: hasReported,
     },
     'Credit costing'
   );

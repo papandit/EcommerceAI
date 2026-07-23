@@ -35,6 +35,13 @@ const settingsSchema = new mongoose.Schema(
     costPerCredit: { type: Number, default: 0 },
     currency: { type: String, default: 'INR' },
     signupFreeCredits: { type: Number, default: 10 },
+    // --- Live BrandShoot key status (auto-synced, never hand-edited) ---
+    // BrandShoot publishes no balance endpoint, so we learn about the key from
+    // the calls we already make: if any response ever carries a remaining-credit
+    // figure we store it here, and a 402 tells us the key is exhausted.
+    brandshootReportedCredits: { type: Number, default: null }, // null = never reported
+    brandshootDepleted: { type: Boolean, default: false }, // last call said "out of credits"
+    brandshootCheckedAt: { type: Date, default: null }, // last time we heard from BrandShoot
     // BrandShoot model ids the admin has published to the shopper try-on picker.
     // Empty = fall back to the default women-only filter (see aiTryon.controller).
     tryonEnabledModelIds: { type: [String], default: [] },

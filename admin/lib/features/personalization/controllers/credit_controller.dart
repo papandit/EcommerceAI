@@ -30,6 +30,11 @@ class CreditController extends GetxController {
   final RxDouble avgPerUser = 0.0.obs;
   final RxDouble estAllocatedCost = 0.0.obs;
   final RxBool savingPool = false.obs;
+  // Live BrandShoot key status, auto-synced from real API calls.
+  final RxBool brandshootConfigured = false.obs;
+  final RxBool brandshootDepleted = false.obs;
+  final RxBool remainingIsLive = false.obs;
+  final RxString brandshootCheckedAt = ''.obs;
 
   // ---- Per-user (customer detail) ----
   final RxBool ledgerLoading = false.obs;
@@ -251,6 +256,12 @@ class CreditController extends GetxController {
       usedTotal.value = _int(d['usedTotal']);
       avgPerUser.value = _double(d['avgPerUser']);
       estAllocatedCost.value = _double(d['estAllocatedCost']);
+      brandshootConfigured.value = d['brandshootConfigured'] == true;
+      brandshootDepleted.value = d['brandshootDepleted'] == true;
+      remainingIsLive.value = d['remainingIsLive'] == true;
+      final checked = (d['brandshootCheckedAt'] ?? '').toString();
+      brandshootCheckedAt.value =
+          checked.isEmpty ? '' : (DateTime.tryParse(checked)?.toLocal().toString().split('.').first ?? '');
     } catch (_) {
       // non-fatal — dashboard just shows last-known / zeros
     } finally {

@@ -27,6 +27,69 @@ async function cfg() {
   return { BASE, KEY };
 }
 
+/**
+ * Keep the admin's view of the key in sync with reality.
+ *
+ * BrandShoot has no balance endpoint, so we learn from the calls we already
+ * make: every response is scanned for a remaining-credit figure, and a 402
+ * ("insufficient credits") flags the key as exhausted. Any successful call
+ * clears that flag. Best-effort — never let this break the actual request.
+ */
+const CREDIT_KEYS = [
+  'creditsRemaining', 'credits_remaining', 'remainingCredits', 'remaining_credits',
+  'creditBalance', 'credit_balance', 'credits', 'balance',
+];
+const CREDIT_HEADERS = [
+  'x-credits-remaining', 'x-credit-balance', 'x-credits', 'x-remaining-credits',
+];
+
+function pickNumber(obj) {
+  if (!obj || typeof obj !== 'object') return null;
+  for (const k of CREDIT_KEYS) {
+    const v = obj[k];
+    if (typeof v === 'number' && Number.isFinite(v)) return v;
+  }
+  return null;
+}
+
+/** Find a remaining-credit figure in a response body or headers, if present. */
+function extractCredits(data, headers) {
+  let n = pickNumber(data);
+  if (n != null) return n;
+  if (data && typeof data === 'object') {
+    for (const parent of ['account', 'usage', 'meta', 'billing', 'quota']) {
+      n = pickNumber(data[parent]);
+      if (n != null) return n;
+    }
+  }
+  if (headers && typeof headers.get === 'function') {
+    for (const h of CREDIT_HEADERS) {
+      const raw = headers.get(h);
+      if (raw != null && raw !== '' && Number.isFinite(Number(raw))) return Number(raw);
+    }
+  }
+  return null;
+}
+
+async function recordKeyStatus({ credits, depleted }) {
+  try {
+    const set = { brandshootCheckedAt: new Date() };
+    if (credits != null) set.brandshootReportedCredits = credits;
+    if (depleted != null) set.brandshootDepleted = depleted;
+    await Settings.updateOne({}, { $set: set }, { upsert: true });
+  } catch (_) {
+    /* status tracking must never break the caller */
+  }
+}
+
+/** Inspect any BrandShoot response and sync what it tells us about the key. */
+async function syncFromResponse(res, data) {
+  const credits = extractCredits(data, res && res.headers);
+  if (res && res.status === 402) return recordKeyStatus({ credits, depleted: true });
+  if (res && res.ok) return recordKeyStatus({ credits, depleted: false });
+  if (credits != null) return recordKeyStatus({ credits });
+}
+
 /** BrandShoot wants RAW base64 — strip any "data:image/png;base64," prefix. */
 function cleanB64(s) {
   if (!s) return s;
@@ -50,6 +113,7 @@ async function post(path, body) {
     body: JSON.stringify(body),
   });
   const data = await r.json().catch(() => ({}));
+  await syncFromResponse(r, data); // keep the admin's key status current
   if (!r.ok) {
     const err = new Error(data.error || data.message || `BrandShoot ${r.status}`);
     err.status = r.status;
@@ -98,6 +162,7 @@ async function getJob(jobId) {
     headers: { 'X-API-Key': KEY },
   });
   const data = await r.json().catch(() => ({}));
+  await syncFromResponse(r, data); // keep the admin's key status current
   if (!r.ok) {
     const e = new Error(data.error || `job ${r.status}`);
     e.status = r.status;

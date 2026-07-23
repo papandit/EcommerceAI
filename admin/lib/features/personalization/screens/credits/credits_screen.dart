@@ -123,6 +123,8 @@ class _CreditsBodyState extends State<CreditsBody> {
               ],
             ),
             const SizedBox(height: TSizes.spaceBtwItems),
+            _keyStatusBanner(),
+            const SizedBox(height: TSizes.spaceBtwItems),
             Wrap(
               spacing: 28,
               runSpacing: 16,
@@ -169,6 +171,70 @@ class _CreditsBodyState extends State<CreditsBody> {
         ),
       );
     });
+  }
+
+  /// Live BrandShoot key status, synced automatically from real API calls.
+  /// BrandShoot publishes no balance endpoint, so this reflects what its
+  /// responses tell us: a 402 means the key is exhausted, and if a response
+  /// ever carries a remaining-credit figure we show it as the live number.
+  Widget _keyStatusBanner() {
+    final Color color;
+    final IconData icon;
+    final String text;
+
+    if (!c.brandshootConfigured.value) {
+      color = Colors.orange;
+      icon = Iconsax.warning_2;
+      text = 'No BrandShoot key set — add it in Settings to enable try-on.';
+    } else if (c.brandshootDepleted.value) {
+      color = Colors.red;
+      icon = Iconsax.close_circle;
+      text = 'BrandShoot reports this key is OUT OF CREDITS. Top up, then '
+          'update the key balance below.';
+    } else if (c.remainingIsLive.value) {
+      color = Colors.green;
+      icon = Iconsax.tick_circle;
+      text = 'Live balance synced from BrandShoot: ${c.remaining.value} credits.';
+    } else {
+      color = Colors.blueGrey;
+      icon = Iconsax.info_circle;
+      text = 'Key active. BrandShoot exposes no balance API, so Remaining is '
+          'your entered total minus tracked usage.';
+    }
+
+    final checked = c.brandshootCheckedAt.value;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: color),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(text,
+                    style: TextStyle(
+                        color: color, fontWeight: FontWeight.w600, fontSize: 13)),
+                if (checked.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text('Last contact with BrandShoot: $checked',
+                        style: Theme.of(context).textTheme.bodySmall),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Enter the credits the BrandShoot key carries + the price per credit, so
