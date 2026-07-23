@@ -50,6 +50,10 @@ class _TryOnPageState extends State<TryOnPage> {
   // signed in). Each try-on costs 1 credit; at 0 the Generate button is blocked.
   int? _credits;
 
+  // An open request to the admin for more credits (null = none pending).
+  Map<String, dynamic>? _pendingRequest;
+  bool _requesting = false;
+
   @override
   void initState() {
     super.initState();
@@ -62,13 +66,53 @@ class _TryOnPageState extends State<TryOnPage> {
     try {
       final data = await ApiClient.instance.getOne('/ai/tryon/credits');
       if (!mounted) return;
-      setState(() => _credits = (data['credits'] as num?)?.toInt());
+      setState(() {
+        _credits = (data['credits'] as num?)?.toInt();
+        final pr = data['pendingRequest'];
+        _pendingRequest = pr is Map ? Map<String, dynamic>.from(pr) : null;
+      });
     } catch (_) {
       // non-fatal — badge just stays hidden
     }
   }
 
   bool get _outOfCredits => _credits != null && _credits! <= 0;
+  bool get _hasPendingRequest => _pendingRequest != null;
+
+  /// Ask the admin for more credits. The request lands in the admin's Credits
+  /// inbox, where it can be approved (which grants the credits) or rejected.
+  Future<void> _requestCredits() async {
+    if (_requesting || _hasPendingRequest) return;
+    setState(() => _requesting = true);
+    try {
+      await ApiClient.instance
+          .post('/ai/tryon/credits/request', {'amount': 10, 'message': ''});
+      if (!mounted) return;
+      setState(() {
+        _pendingRequest = {'amount': 10};
+        _requesting = false;
+      });
+      _toast('Request sent — the admin will review it shortly.');
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _requesting = false;
+        if (e.statusCode == 409) _pendingRequest = {'amount': 10};
+      });
+      _toast(e.message);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _requesting = false);
+      _toast('Could not send the request. Please try again.');
+    }
+  }
+
+  void _toast(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
+    );
+  }
 
   Future<void> _loadModels() async {
     if (!ApiClient.instance.hasToken) return; // models endpoint requires auth
@@ -408,6 +452,10 @@ class _TryOnPageState extends State<TryOnPage> {
           if (_credits != null) ...[
             const SizedBox(height: 14),
             _creditsBadge(),
+            if (_outOfCredits) ...[
+              const SizedBox(height: 10),
+              _requestCreditsBtn(),
+            ],
           ],
           const SizedBox(height: 14),
           _primaryBtn(
@@ -554,7 +602,9 @@ class _TryOnPageState extends State<TryOnPage> {
           Flexible(
             child: Text(
               out
-                  ? 'No try-on credits left. Please contact us for more.'
+                  ? (_hasPendingRequest
+                      ? 'Request sent — waiting for admin approval.'
+                      : 'No try-on credits left. Ask the admin for more.')
                   : (n == 1
                       ? '1 try-on credit left'
                       : '$n try-on credits left'),
@@ -566,6 +616,37 @@ class _TryOnPageState extends State<TryOnPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// "Ask admin for credits" button, shown when the shopper is out of credits.
+  /// Disabled once a request is pending so they can't spam the admin inbox.
+  Widget _requestCreditsBtn() {
+    final pending = _hasPendingRequest;
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: (pending || _requesting) ? null : _requestCredits,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColor.primary,
+          side: BorderSide(color: AppColor.primary.withValues(alpha: 0.5)),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.sm),
+        ),
+        icon: _requesting
+            ? SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: AppColor.primary),
+              )
+            : Icon(pending ? Icons.hourglass_top : Icons.card_giftcard_outlined,
+                size: 18),
+        label: Text(
+          pending ? 'Request pending' : 'Ask admin for credits',
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        ),
       ),
     );
   }
