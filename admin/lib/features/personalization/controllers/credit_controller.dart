@@ -22,6 +22,14 @@ class CreditController extends GetxController {
   final RxString currency = 'INR'.obs;
   final RxDouble estConsumedCost = 0.0.obs;
   final RxDouble estRemainingValue = 0.0.obs;
+  // Distribution aggregates
+  final RxInt totalUsers = 0.obs;
+  final RxInt allocated = 0.obs;
+  final RxInt grantedTotal = 0.obs;
+  final RxInt usedTotal = 0.obs;
+  final RxDouble avgPerUser = 0.0.obs;
+  final RxDouble estAllocatedCost = 0.0.obs;
+  final RxBool savingPool = false.obs;
 
   // ---- Per-user (customer detail) ----
   final RxBool ledgerLoading = false.obs;
@@ -60,6 +68,29 @@ class CreditController extends GetxController {
       fetchRequests(),
       fetchModels(),
     ]);
+  }
+
+  /// Save the pool total / price per credit, then refresh the dashboard.
+  Future<void> savePool({
+    int? purchasedCredits,
+    double? costPerCredit,
+    String? currency,
+  }) async {
+    try {
+      savingPool.value = true;
+      await _repo.setPool(
+        purchasedCredits: purchasedCredits,
+        costPerCredit: costPerCredit,
+        currency: currency,
+      );
+      await fetchSummary();
+      TLoaders.successSnackBar(
+          title: 'Pool updated', message: 'Credit pool and pricing saved.');
+    } catch (e) {
+      TLoaders.errorSnackBar(title: 'Oh Snap', message: e.toString());
+    } finally {
+      savingPool.value = false;
+    }
   }
 
   // ---- Users -------------------------------------------------------------
@@ -214,6 +245,12 @@ class CreditController extends GetxController {
       currency.value = (d['currency'] ?? 'INR').toString();
       estConsumedCost.value = _double(d['estConsumedCost']);
       estRemainingValue.value = _double(d['estRemainingValue']);
+      totalUsers.value = _int(d['totalUsers']);
+      allocated.value = _int(d['allocated']);
+      grantedTotal.value = _int(d['grantedTotal']);
+      usedTotal.value = _int(d['usedTotal']);
+      avgPerUser.value = _double(d['avgPerUser']);
+      estAllocatedCost.value = _double(d['estAllocatedCost']);
     } catch (_) {
       // non-fatal — dashboard just shows last-known / zeros
     } finally {

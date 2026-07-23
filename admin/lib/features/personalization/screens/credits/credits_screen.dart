@@ -4,6 +4,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../common/widgets/breadcrumbs/breadcrumb_with_heading.dart';
 import '../../../../common/widgets/containers/rounded_container.dart';
+import '../../../../common/widgets/layouts/templates/site_layout.dart';
 import '../../../../data/repositories/credits/credit_request_model.dart';
 import '../../../../data/repositories/credits/credit_user_model.dart';
 import '../../../../utils/constants/colors.dart';
@@ -12,17 +13,36 @@ import '../../controllers/credit_controller.dart';
 
 /// Admin "Try-On Credits" hub: pool costing, shopper credit requests,
 /// per-user distribution (add / set / deduct) and try-on model curation.
-class CreditsScreen extends StatefulWidget {
+///
+/// Wrapped in [TSiteTemplate] so it gets the standard admin chrome (sidebar +
+/// header) like every other screen.
+class CreditsScreen extends StatelessWidget {
   const CreditsScreen({super.key});
 
   @override
-  State<CreditsScreen> createState() => _CreditsScreenState();
+  Widget build(BuildContext context) {
+    return const TSiteTemplate(
+      desktop: CreditsBody(),
+      tablet: CreditsBody(),
+      mobile: CreditsBody(),
+    );
+  }
 }
 
-class _CreditsScreenState extends State<CreditsScreen> {
+class CreditsBody extends StatefulWidget {
+  const CreditsBody({super.key});
+
+  @override
+  State<CreditsBody> createState() => _CreditsBodyState();
+}
+
+class _CreditsBodyState extends State<CreditsBody> {
   late final CreditController c;
   final _bulkAmount = TextEditingController(text: '10');
   final _search = TextEditingController();
+  final _poolTotal = TextEditingController();
+  final _poolCost = TextEditingController();
+  Worker? _poolSync;
 
   @override
   void initState() {
@@ -31,38 +51,48 @@ class _CreditsScreenState extends State<CreditsScreen> {
         ? CreditController.instance
         : Get.put(CreditController());
     c.loadAll();
+    // Pre-fill the pool inputs once the summary lands (and whenever it changes),
+    // but never clobber what the admin is currently typing.
+    _poolSync = ever<int>(c.purchased, (_) {
+      if (!mounted) return;
+      if (_poolTotal.text.isEmpty) _poolTotal.text = '${c.purchased.value}';
+      if (_poolCost.text.isEmpty && c.costPerCredit.value > 0) {
+        _poolCost.text = c.costPerCredit.value.toString();
+      }
+    });
   }
 
   @override
   void dispose() {
+    _poolSync?.dispose();
     _bulkAmount.dispose();
     _search.dispose();
+    _poolTotal.dispose();
+    _poolCost.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(TSizes.defaultSpace),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const TBreadcrumbsWithHeading(
-                  heading: 'Try-On Credits', breadcrumbItems: ['Credits']),
-              const SizedBox(height: TSizes.spaceBtwSections),
-              _summary(),
-              const SizedBox(height: TSizes.spaceBtwSections),
-              _bulkDistribute(),
-              const SizedBox(height: TSizes.spaceBtwSections),
-              _requestsInbox(),
-              const SizedBox(height: TSizes.spaceBtwSections),
-              _usersTable(),
-              const SizedBox(height: TSizes.spaceBtwSections),
-              _modelCuration(),
-            ],
-          ),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(TSizes.defaultSpace),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const TBreadcrumbsWithHeading(
+                heading: 'Try-On Credits', breadcrumbItems: ['Credits']),
+            const SizedBox(height: TSizes.spaceBtwSections),
+            _summary(),
+            const SizedBox(height: TSizes.spaceBtwSections),
+            _bulkDistribute(),
+            const SizedBox(height: TSizes.spaceBtwSections),
+            _requestsInbox(),
+            const SizedBox(height: TSizes.spaceBtwSections),
+            _usersTable(),
+            const SizedBox(height: TSizes.spaceBtwSections),
+            _modelCuration(),
+          ],
         ),
       ),
     );
@@ -97,18 +127,112 @@ class _CreditsScreenState extends State<CreditsScreen> {
               spacing: 28,
               runSpacing: 16,
               children: [
-                _stat('Purchased', '${c.purchased.value}'),
+                _stat('Key credits', '${c.purchased.value}'),
                 _stat('Consumed', '${c.consumed.value}'),
                 _stat('Remaining', '${c.remaining.value}',
                     danger: c.remaining.value < 0),
                 _stat('Spent (est.)',
                     '$cur ${c.estConsumedCost.value.toStringAsFixed(2)}'),
+                _stat('Pool value left',
+                    '$cur ${c.estRemainingValue.value.toStringAsFixed(2)}'),
               ],
             ),
+            if (c.remaining.value < 0) ...[
+              const SizedBox(height: 10),
+              Text(
+                'Remaining is negative because the pool total is lower than what '
+                'has been used. Enter the credits your BrandShoot key actually '
+                'carries below.',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(color: Colors.red),
+              ),
+            ],
+            const Divider(height: 28),
+            // Distribution across shoppers.
+            Wrap(
+              spacing: 28,
+              runSpacing: 16,
+              children: [
+                _stat('Users', '${c.totalUsers.value}'),
+                _stat('Held by users', '${c.allocated.value}'),
+                _stat('Avg / user', c.avgPerUser.value.toStringAsFixed(1)),
+                _stat('Used by users', '${c.usedTotal.value}'),
+                _stat('Held value',
+                    '$cur ${c.estAllocatedCost.value.toStringAsFixed(2)}'),
+              ],
+            ),
+            const Divider(height: 28),
+            _poolEditor(cur),
           ],
         ),
       );
     });
+  }
+
+  /// Enter the credits the BrandShoot key carries + the price per credit, so
+  /// every figure above (and per-user cost) is computed from real numbers.
+  Widget _poolEditor(String cur) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Key balance & pricing',
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: 4),
+        Text(
+          'Enter the credits included with your BrandShoot API key (e.g. 10000) '
+          'and what you paid per credit.',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            SizedBox(
+              width: 170,
+              child: TextField(
+                controller: _poolTotal,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                    labelText: 'Key credits', isDense: true),
+              ),
+            ),
+            SizedBox(
+              width: 170,
+              child: TextField(
+                controller: _poolCost,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                    labelText: 'Cost / credit ($cur)', isDense: true),
+              ),
+            ),
+            Obx(() => ElevatedButton.icon(
+                  onPressed: c.savingPool.value ? null : _savePool,
+                  style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 18)),
+                  icon: const Icon(Iconsax.save_2, size: 16),
+                  label: const Text('Save pool',
+                      softWrap: false, overflow: TextOverflow.visible),
+                )),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _savePool() {
+    final total = int.tryParse(_poolTotal.text.trim());
+    final cost = double.tryParse(_poolCost.text.trim());
+    if (total == null && cost == null) return;
+    c.savePool(purchasedCredits: total, costPerCredit: cost);
   }
 
   Widget _stat(String label, String value, {bool danger = false}) {
@@ -156,15 +280,24 @@ class _CreditsScreenState extends State<CreditsScreen> {
                       labelText: 'Amount', isDense: true),
                 ),
               ),
+              // Intrinsic width + no-wrap label, so the text is never clipped.
               Obx(() => ElevatedButton.icon(
                     onPressed: c.adjusting.value ? null : () => _bulk(false),
+                    style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 18)),
                     icon: const Icon(Iconsax.people, size: 16),
-                    label: const Text('Give to everyone'),
+                    label: const Text('Give to everyone',
+                        softWrap: false, overflow: TextOverflow.visible),
                   )),
               Obx(() => OutlinedButton.icon(
                     onPressed: c.adjusting.value ? null : () => _bulk(true),
+                    style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 18)),
                     icon: const Icon(Iconsax.user_add, size: 16),
-                    label: const Text('Only users with none'),
+                    label: const Text('Only users with none',
+                        softWrap: false, overflow: TextOverflow.visible),
                   )),
             ],
           ),
@@ -407,9 +540,15 @@ class _CreditsScreenState extends State<CreditsScreen> {
             ),
           ),
           Expanded(
-            flex: 2,
-            child: Text('Granted ${u.grantedTotal} · Used ${u.consumedTotal}',
-                style: Theme.of(context).textTheme.bodySmall),
+            flex: 3,
+            child: Obx(() {
+              final cost = u.consumedTotal * c.costPerCredit.value;
+              return Text(
+                'Granted ${u.grantedTotal} · Used ${u.consumedTotal}'
+                '${c.costPerCredit.value > 0 ? ' · ${c.currency.value} ${cost.toStringAsFixed(2)}' : ''}',
+                style: Theme.of(context).textTheme.bodySmall,
+              );
+            }),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),

@@ -48,6 +48,20 @@ class CreditRepository extends GetxController {
     return (num.tryParse((data['purchasedCredits'] ?? 0).toString()) ?? 0).toInt();
   }
 
+  /// Set the pool to the credits the BrandShoot key carries, and/or the price
+  /// per credit. Any omitted field is left unchanged.
+  Future<void> setPool({
+    int? purchasedCredits,
+    double? costPerCredit,
+    String? currency,
+  }) async {
+    await _api.post('/admin/credits/pool', {
+      if (purchasedCredits != null) 'purchasedCredits': purchasedCredits,
+      if (costPerCredit != null) 'costPerCredit': costPerCredit,
+      if (currency != null) 'currency': currency,
+    });
+  }
+
   /// Every user with their credit balance (for the distribution table).
   Future<List<CreditUserModel>> getUsers({String search = ''}) async {
     final rows = await _api.getList('/admin/credits/users',
