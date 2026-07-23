@@ -65,6 +65,13 @@ class ApiClient {
     }
     final ok = res.statusCode >= 200 && res.statusCode < 300;
     if (!ok) {
+      // A 401 while we still hold a token means the session expired or was
+      // revoked. Drop it so the app reverts to a proper logged-out state and
+      // shows the login prompt, instead of silently failing every cart /
+      // wishlist / try-on call while still looking signed in.
+      if (res.statusCode == 401 && hasToken) {
+        clearSession();
+      }
       final msg = (body is Map && body['message'] != null)
           ? body['message'].toString()
           : 'Request failed (${res.statusCode})';

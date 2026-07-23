@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 
+import '../../../routes/routes.dart';
 import 'api_config.dart';
 
 /// Storage keys for the JWT session (GetStorage).
@@ -62,6 +64,11 @@ class ApiClient {
     }
     final ok = res.statusCode >= 200 && res.statusCode < 300;
     if (!ok) {
+      // A 401 while we still hold a token means the session expired or was
+      // revoked. Without this the middleware keeps letting the admin in (it only
+      // checks that a token *exists*), every call fails, and screens look
+      // "stuck" with no way back to login.
+      if (res.statusCode == 401 && hasToken) _handleExpiredSession();
       final msg = (body is Map && body['message'] != null)
           ? body['message'].toString()
           : 'Request failed (${res.statusCode})';
@@ -170,6 +177,20 @@ class ApiClient {
   }
 
   bool get hasToken => (token ?? '').isNotEmpty;
+
+  /// Expired/revoked session: drop the stored token and bounce to login once.
+  /// Guarded so a burst of parallel 401s can't stack multiple redirects.
+  bool _redirectingToLogin = false;
+  void _handleExpiredSession() {
+    if (_redirectingToLogin) return;
+    _redirectingToLogin = true;
+    clearSession().whenComplete(() {
+      _redirectingToLogin = false;
+      if (Get.currentRoute != TRoutes.login) {
+        Get.offAllNamed(TRoutes.login);
+      }
+    });
+  }
 
   Future<void> clearSession() async {
     await _storage.remove(ApiKeys.token);

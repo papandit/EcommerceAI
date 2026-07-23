@@ -75,84 +75,89 @@ class _MyAppState extends State<MyApp> {
   final routerDelegate = BeamerDelegate(
     transitionDelegate: NoAnimationTransitionDelegate(),
     locationBuilder: (routeinfo, data) {
+      // Beamer passes `data` as nullable: it is only non-null when we navigate
+      // in-app via beamToNamed(..., data: ...). Browser back/forward, a page
+      // refresh or a pasted deep link all call this with null — force-unwrapping
+      // it crashed the route build, which is why the back button appeared dead.
+      final params = data ?? const BeamParameters();
       if (routeinfo.uri.pathSegments.contains('ProductDetailScreen')) {
-        return ProductDetailScreenLocation(routeinfo, data!);
+        return ProductDetailScreenLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('TryOnHistory')) {
-        return TryOnHistoryLocation(routeinfo, data!);
+        return TryOnHistoryLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('TryOn')) {
-        return TryOnLocation(routeinfo, data!);
+        return TryOnLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('HomePage')) {
-        return HomeLocation(routeinfo, data!);
+        return HomeLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('SpleshPage')) {
-        return SpleshLocation(routeinfo, data!);
+        return SpleshLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('BottomBar')) {
-        return BottomBarLocation(routeinfo, data!);
+        return BottomBarLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('FavoritePage')) {
-        return FavoritePageLocation(routeinfo, data!);
+        return FavoritePageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('FilterPage')) {
-        return FilterPageLocation(routeinfo, data!);
+        return FilterPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('ForgotpasswordPage')) {
-        return ForgotpasswordPageLocation(routeinfo, data!);
+        return ForgotpasswordPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('Pages')) {
-        return HtmlConainLocation(routeinfo, data!);
+        return HtmlConainLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('Page')) {
-        return HtmlConainCopyLocation(routeinfo, data!);
+        return HtmlConainCopyLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('IntroPage')) {
-        return IntroPageLocation(routeinfo, data!);
+        return IntroPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('LegalPolicy')) {
-        return LegalPolicyLocation(routeinfo, data!);
+        return LegalPolicyLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('LoginPage')) {
-        return LoginPageLocation(routeinfo, data!);
+        return LoginPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('Myaddresses')) {
-        return MyaddressesLocation(routeinfo, data!);
+        return MyaddressesLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('MyOrderPage')) {
-        return MyOrderPageLocation(routeinfo, data!);
+        return MyOrderPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('SuccessPage')) {
-        return SuccessPageLocation(routeinfo, data!);
+        return SuccessPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('NotificationPage')) {
-        return NotificationPageLocation(routeinfo, data!);
+        return NotificationPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('DeliveryAdressadd')) {
-        return DeliveryAdressaddLocation(routeinfo, data!);
+        return DeliveryAdressaddLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('Verifyotp')) {
-        return VerifyotpLocation(routeinfo, data!);
+        return VerifyotpLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('CategoryPage')) {
-        return CategoryPageLocation(routeinfo, data!);
+        return CategoryPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('CategoryPages')) {
-        return CategoryPageCopyLocation(routeinfo, data!);
+        return CategoryPageCopyLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('ViewAll')) {
-        return ViewAllLocation(routeinfo, data!);
+        return ViewAllLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('DeliveryAdress')) {
-        return DeliveryAdressLocation(routeinfo, data!);
+        return DeliveryAdressLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('DeliveryAdressadds')) {
-        return DeliveryAdressaddsLocation(routeinfo, data!);
+        return DeliveryAdressaddsLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('OrderDetails')) {
-        return OrderDetailsLocation(routeinfo, data!);
+        return OrderDetailsLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('PopularPage')) {
-        return PopularPageLocation(routeinfo, data!);
+        return PopularPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('ProfilePage')) {
-        return ProfilePageLocation(routeinfo, data!);
+        return ProfilePageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('RegisterPage')) {
-        return RegisterPageLocation(routeinfo, data!);
+        return RegisterPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('ReviewPage')) {
-        return ReviewPageLocation(routeinfo, data!);
+        return ReviewPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('SearchPage')) {
-        return SearchPageLocation(routeinfo, data!);
+        return SearchPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('ShoppingPage')) {
-        return ShoppingPageLocation(routeinfo, data!);
+        return ShoppingPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('UpdateProfile')) {
-        return UpdateProfileLocation(routeinfo, data!);
+        return UpdateProfileLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('CheckoutPage')) {
-        return CheckoutPageLocation(routeinfo, data!);
+        return CheckoutPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('ChnagepasswordPage')) {
-        return ChnagepasswordPageLocation(routeinfo, data!);
+        return ChnagepasswordPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('CategoryViewallPage')) {
-        return CategoryViewallPageLocation(routeinfo, data!);
+        return CategoryViewallPageLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('ContectUs')) {
-        return ContectUsLocation(routeinfo, data!);
+        return ContectUsLocation(routeinfo, params);
       } else if (routeinfo.uri.pathSegments.contains('AllProducts')) {
-        return AllProductsLocation(routeinfo, data!);
+        return AllProductsLocation(routeinfo, params);
       } else {
-        return SpleshLocation(routeinfo, data!);
+        return SpleshLocation(routeinfo, params);
       }
     },
   );
