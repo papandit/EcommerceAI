@@ -8,7 +8,13 @@ class GeneralBindings extends Bindings {
   void dependencies() {
     /// -- Core
     Get.lazyPut(() => NetworkManager(), fenix: true);
-    Get.lazyPut(() => UserController(), fenix: true);
-    Get.lazyPut(() => SettingsController(), fenix: true);
+
+    /// App-wide controllers feeding the persistent chrome (sidebar logo/name,
+    /// header profile). With `fenix` these were disposed and rebuilt during
+    /// navigation, re-running onInit() — so every section change re-fetched
+    /// settings and blanked the sidebar, which looked like a page reload.
+    /// `permanent` keeps one instance alive for the whole session.
+    Get.put(UserController(), permanent: true);
+    Get.put(SettingsController(), permanent: true);
   }
 }

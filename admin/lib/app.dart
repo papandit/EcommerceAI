@@ -24,6 +24,11 @@ class App extends StatelessWidget {
       initialBinding: GeneralBindings(),
       navigatorObservers: [RouteObservers()],
       scrollBehavior: MyCustomScrollBehavior(),
+      // Every screen wraps itself in TSiteTemplate, so switching sections
+      // rebuilds the whole shell. Without a transition that swap lands as an
+      // abrupt "page reload" flash — a short crossfade smooths it out.
+      defaultTransition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 220),
       initialRoute: TRoutes.dashboard,
       getPages: TAppRoute.pages,
       home: const Scaffold(
