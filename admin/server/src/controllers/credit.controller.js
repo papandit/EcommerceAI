@@ -19,6 +19,24 @@ const costingSummary = asyncHandler(async (_req, res) => {
   const currency = s.currency || 'INR';
   const consumed = await credits.getConsumedCredits();
   const remaining = purchased - consumed;
+
+  // User-side aggregates so the dashboard reflects real distribution, not just
+  // the pool: how many credits are sitting in shopper balances right now, how
+  // many were ever handed out, and the average per user.
+  const agg = await User.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalUsers: { $sum: 1 },
+        allocated: { $sum: { $ifNull: ['$tryonCredits', 0] } },
+        grantedTotal: { $sum: { $ifNull: ['$creditsGrantedTotal', 0] } },
+        usedTotal: { $sum: { $ifNull: ['$creditsConsumedTotal', 0] } },
+      },
+    },
+  ]);
+  const a = agg[0] || { totalUsers: 0, allocated: 0, grantedTotal: 0, usedTotal: 0 };
+  const avgPerUser = a.totalUsers ? a.allocated / a.totalUsers : 0;
+
   return ok(
     res,
     {
@@ -29,6 +47,13 @@ const costingSummary = asyncHandler(async (_req, res) => {
       currency,
       estConsumedCost: consumed * costPerCredit,
       estRemainingValue: remaining * costPerCredit,
+      // distribution
+      totalUsers: a.totalUsers,
+      allocated: a.allocated,
+      grantedTotal: a.grantedTotal,
+      usedTotal: a.usedTotal,
+      avgPerUser,
+      estAllocatedCost: a.allocated * costPerCredit,
     },
     'Credit costing'
   );
@@ -76,6 +101,41 @@ const purchase = asyncHandler(async (req, res) => {
     createdBy: req.user.id,
   });
   return ok(res, { purchasedCredits }, 'Purchase recorded');
+});
+
+// POST /api/admin/credits/pool  body: { purchasedCredits?, costPerCredit?, currency? }
+// Set the pool to the credits the BrandShoot key actually carries (e.g. 10000)
+// and the price per credit. Used by the Credit pool card on the Credits page.
+const setPool = asyncHandler(async (req, res) => {
+  const b = req.body || {};
+  const update = {};
+  if (b.purchasedCredits != null) {
+    const n = Number(b.purchasedCredits);
+    if (!Number.isFinite(n) || n < 0) {
+      return fail(res, 'purchasedCredits must be 0 or more.', 400);
+    }
+    update.purchasedCredits = Math.round(n);
+  }
+  if (b.costPerCredit != null) {
+    const c = Number(b.costPerCredit);
+    if (!Number.isFinite(c) || c < 0) {
+      return fail(res, 'costPerCredit must be 0 or more.', 400);
+    }
+    update.costPerCredit = c;
+  }
+  if (b.currency != null) update.currency = String(b.currency).trim() || 'INR';
+  if (!Object.keys(update).length) return fail(res, 'Nothing to update.', 400);
+
+  const doc = await Settings.findOneAndUpdate({}, { $set: update }, { new: true, upsert: true });
+  return ok(
+    res,
+    {
+      purchasedCredits: doc.purchasedCredits,
+      costPerCredit: doc.costPerCredit,
+      currency: doc.currency,
+    },
+    'Credit pool updated'
+  );
 });
 
 // GET /api/admin/credits/users?search= — every user with their credit balance,
@@ -173,6 +233,7 @@ module.exports = {
   userLedger,
   adjustUser,
   purchase,
+  setPool,
   listUsers,
   listRequests,
   handleRequest,

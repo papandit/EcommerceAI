@@ -12,6 +12,7 @@ router.get('/users', ctrl.listUsers);
 router.get('/users/:id/ledger', ctrl.userLedger);
 router.post('/users/:id/adjust', ctrl.adjustUser);
 router.post('/purchase', ctrl.purchase);
+router.post('/pool', ctrl.setPool);
 // Shopper credit requests (admin inbox)
 router.get('/requests', ctrl.listRequests);
 router.post('/requests/:id', ctrl.handleRequest);
