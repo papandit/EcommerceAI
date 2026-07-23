@@ -184,6 +184,10 @@ class TSidebar extends StatelessWidget {
                         icon: Icons.star_border,
                         itemName: 'Reviews'),
                     const TMenuItem(
+                        route: TRoutes.credits,
+                        icon: Icons.card_giftcard_outlined,
+                        itemName: 'Try-On Credits'),
+                    const TMenuItem(
                         route: TRoutes.profile,
                         icon: Icons.person_outline,
                         itemName: 'Profile'),

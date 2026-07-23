@@ -16,6 +16,7 @@ import 'package:cwt_ecommerce_admin_panel/features/personalization/screens/other
 import 'package:cwt_ecommerce_admin_panel/features/personalization/screens/others/responsive_screens/widget/secure_payment_widget.dart';
 import 'package:cwt_ecommerce_admin_panel/features/personalization/screens/others/responsive_screens/widget/size_chart_widget.dart';
 import 'package:cwt_ecommerce_admin_panel/features/personalization/screens/profile/profile.dart';
+import 'package:cwt_ecommerce_admin_panel/features/personalization/screens/credits/credits_screen.dart';
 import 'package:cwt_ecommerce_admin_panel/features/personalization/screens/settings/settings.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/screens/banner/edit_banner/edit_banner.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/screens/brand/all_brands/brands.dart';
@@ -197,6 +198,11 @@ class TAppRoute {
     GetPage(
         name: TRoutes.settings,
         page: () => const SettingsScreen(),
+        middlewares: [TRouteMiddleware()]),
+    // try-on credits: costing, requests, per-user distribution, model curation
+    GetPage(
+        name: TRoutes.credits,
+        page: () => const CreditsScreen(),
         middlewares: [TRouteMiddleware()]),
     GetPage(
         name: TRoutes.profile,

@@ -51,6 +51,7 @@ class TRoutes {
   static const createnotification = '/createnotification';
 
   static const settings = '/settings';
+  static const credits = '/credits';
   static const profile = '/profile';
   static const createOther = '/createOther';
   static const editOther = '/editOther';
@@ -78,6 +79,7 @@ class TRoutes {
     orders,
     coupons,
     others,
+    credits,
     settings,
     profile,
     notification,
