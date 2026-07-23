@@ -1,4 +1,5 @@
 const Settings = require('../models/settings.model');
+const credits = require('../utils/credits');
 const { ok, asyncHandler } = require('../utils/response');
 
 /**
@@ -27,13 +28,32 @@ const update = asyncHandler(async (req, res) => {
   if (body.brandshootKey == null || String(body.brandshootKey).trim() === '') {
     delete body.brandshootKey;
   }
-  let doc = await Settings.findOne();
+  const before = await Settings.findOne();
+  const hadKey = !!(before && before.brandshootKey);
+
+  let doc = before;
   if (!doc) doc = await Settings.create(body);
   else {
     Object.assign(doc, body);
     await doc.save();
   }
-  return ok(res, redact(doc), 'Settings updated');
+
+  // Turning BrandShoot ON for the first time hands every existing user their
+  // free try-on credits, so nobody is stuck at 0 just because their account
+  // predates the credit system. Idempotent — only ungranted users are topped up.
+  let grantedUsers = 0;
+  if (!hadKey && doc.brandshootKey) {
+    grantedUsers = await credits.grantToAllUngranted({
+      amount: doc.signupFreeCredits,
+      reason: 'brandshoot_enabled',
+      createdBy: req.user && req.user.id,
+    });
+    if (grantedUsers) {
+      console.log(`[credits] BrandShoot enabled — granted ${doc.signupFreeCredits} credits to ${grantedUsers} user(s).`);
+    }
+  }
+
+  return ok(res, { ...redact(doc), grantedUsers }, 'Settings updated');
 });
 
 module.exports = { get, update };

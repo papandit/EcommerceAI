@@ -152,6 +152,71 @@ async function adminAdjust({ userId, op, amount, reason = '', createdBy = null }
   return { balanceAfter: user.tryonCredits, ledger };
 }
 
+/**
+ * Grant `amount` credits to every user who has never been granted any (i.e.
+ * accounts that predate the credit system). Idempotent: the per-user update is
+ * conditional, so running this twice never double-grants. Returns the count.
+ * Used when the BrandShoot key is first configured and by the backfill script.
+ */
+async function grantToAllUngranted({ amount, reason = '', createdBy = null } = {}) {
+  const n = Math.max(0, Math.round(Number(amount) || 0));
+  if (!n) return 0;
+  const notGranted = {
+    $or: [{ creditsGrantedTotal: { $exists: false } }, { creditsGrantedTotal: { $lte: 0 } }],
+  };
+  const users = await User.find(notGranted).select('_id').lean();
+  let granted = 0;
+  for (const u of users) {
+    const updated = await User.findOneAndUpdate(
+      { _id: u._id, ...notGranted },
+      { $inc: { tryonCredits: n, creditsGrantedTotal: n } },
+      { new: true }
+    );
+    if (!updated) continue;
+    await log({
+      type: 'signup_grant',
+      userId: updated._id,
+      amount: n,
+      balanceAfter: updated.tryonCredits,
+      feature: 'signup',
+      reason,
+      createdBy,
+    });
+    granted += 1;
+  }
+  return granted;
+}
+
+/**
+ * Add `amount` credits to EVERY user (admin bulk distribution), regardless of
+ * whether they were granted before. Returns the number of users topped up.
+ */
+async function grantToEveryone({ amount, reason = '', createdBy = null } = {}) {
+  const n = Math.max(0, Math.round(Number(amount) || 0));
+  if (!n) return 0;
+  const users = await User.find({}).select('_id').lean();
+  let granted = 0;
+  for (const u of users) {
+    const updated = await User.findOneAndUpdate(
+      { _id: u._id },
+      { $inc: { tryonCredits: n, creditsGrantedTotal: n } },
+      { new: true }
+    );
+    if (!updated) continue;
+    await log({
+      type: 'admin_grant',
+      userId: updated._id,
+      amount: n,
+      balanceAfter: updated.tryonCredits,
+      feature: 'admin',
+      reason,
+      createdBy,
+    });
+    granted += 1;
+  }
+  return granted;
+}
+
 /** Net credits consumed (consume rows minus refunds) — for the costing dashboard. */
 async function getConsumedCredits() {
   const rows = await CreditLedger.aggregate([
@@ -170,5 +235,7 @@ module.exports = {
   recordPoolConsume,
   recordPoolPurchase,
   adminAdjust,
+  grantToAllUngranted,
+  grantToEveryone,
   getConsumedCredits,
 };

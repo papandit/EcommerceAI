@@ -8,8 +8,15 @@ const ctrl = require('../controllers/credit.controller');
 router.use(auth, admin);
 
 router.get('/summary', ctrl.costingSummary);
+router.get('/users', ctrl.listUsers);
 router.get('/users/:id/ledger', ctrl.userLedger);
 router.post('/users/:id/adjust', ctrl.adjustUser);
 router.post('/purchase', ctrl.purchase);
+// Shopper credit requests (admin inbox)
+router.get('/requests', ctrl.listRequests);
+router.post('/requests/:id', ctrl.handleRequest);
+router.delete('/requests/:id', ctrl.deleteRequest);
+// Bulk distribution
+router.post('/grant-all', ctrl.grantAll);
 
 module.exports = router;

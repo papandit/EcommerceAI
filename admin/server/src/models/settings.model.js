@@ -34,7 +34,10 @@ const settingsSchema = new mongoose.Schema(
     purchasedCredits: { type: Number, default: 0 },
     costPerCredit: { type: Number, default: 0 },
     currency: { type: String, default: 'INR' },
-    signupFreeCredits: { type: Number, default: 3 },
+    signupFreeCredits: { type: Number, default: 10 },
+    // BrandShoot model ids the admin has published to the shopper try-on picker.
+    // Empty = fall back to the default women-only filter (see aiTryon.controller).
+    tryonEnabledModelIds: { type: [String], default: [] },
   },
   baseSchemaOptions
 );

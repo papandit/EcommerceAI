@@ -3,8 +3,9 @@ const Product = require('../models/product.model');
 const TryOnJob = require('../models/tryOnJob.model');
 const Settings = require('../models/settings.model');
 const User = require('../models/user.model');
+const CreditRequest = require('../models/creditRequest.model');
 const credits = require('../utils/credits');
-const { ok, fail, asyncHandler } = require('../utils/response');
+const { ok, created, fail, asyncHandler } = require('../utils/response');
 
 /** Shopper-facing error mapping — never expose credit/key problems to shoppers. */
 function bsMessage(status) {
@@ -32,14 +33,25 @@ function handleBsError(e, res) {
 const WOMEN_RE = /woman|girl|female/i;
 const EXCLUDE_RE = /baby/i;
 
-// GET /api/ai/models — women/girl models (Indian + International) for try-on.
+// GET /api/ai/models — the models a shopper can try the product on.
+// If the admin has curated a selection (Settings.tryonEnabledModelIds), only
+// those are shown; otherwise we fall back to the default women-only filter.
 const models = asyncHandler(async (_req, res) => {
   try {
     const all = await bs.getModels('photoshoot');
-    const women = (all || []).filter(
-      (m) => WOMEN_RE.test(m.name || '') && !EXCLUDE_RE.test(m.name || '')
-    );
-    return ok(res, women, 'Models');
+    const s = await Settings.findOne().select('tryonEnabledModelIds').lean();
+    const picked = (s && s.tryonEnabledModelIds) || [];
+
+    let list;
+    if (picked.length) {
+      const allow = new Set(picked.map(String));
+      list = (all || []).filter((m) => allow.has(String(m.id)));
+    } else {
+      list = (all || []).filter(
+        (m) => WOMEN_RE.test(m.name || '') && !EXCLUDE_RE.test(m.name || '')
+      );
+    }
+    return ok(res, list, 'Models');
   } catch (e) {
     return handleBsError(e, res);
   }
@@ -78,6 +90,11 @@ const tryon = asyncHandler(async (req, res) => {
     // The "person" is either the shopper's uploaded photo or a preset model
     // (we fetch the chosen model's image server-side and use it as the photo).
     if (!personImage && modelId) {
+      // Respect the admin's curated selection, if there is one.
+      const picked = (settings && settings.tryonEnabledModelIds) || [];
+      if (picked.length && !picked.map(String).includes(String(modelId))) {
+        return fail(res, 'That model is not available. Please pick another.', 400);
+      }
       const allModels = await bs.getModels('photoshoot');
       const chosen = (allModels || []).find((m) => String(m.id) === String(modelId));
       if (!chosen || !chosen.imageFullUrl) {
@@ -125,10 +142,50 @@ const tryon = asyncHandler(async (req, res) => {
   }
 });
 
-// GET /api/ai/tryon/credits — the signed-in shopper's remaining try-on credits.
+// GET /api/ai/tryon/credits — the shopper's remaining credits + any open request.
 const balance = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).select('tryonCredits').lean();
-  return ok(res, { credits: user ? user.tryonCredits || 0 : 0 }, 'Credits');
+  const pending = await CreditRequest.findOne({ userId: req.user.id, status: 'pending' })
+    .select('amount createdAt')
+    .lean();
+  return ok(
+    res,
+    {
+      credits: user ? user.tryonCredits || 0 : 0,
+      pendingRequest: pending ? { amount: pending.amount, createdAt: pending.createdAt } : null,
+    },
+    'Credits'
+  );
+});
+
+// POST /api/ai/tryon/credits/request  body: { amount?, message? }
+// Shopper asks the admin for more credits; lands in the admin Credits inbox.
+const requestCredits = asyncHandler(async (req, res) => {
+  const b = req.body || {};
+  const amount = Math.max(1, Math.min(100, Math.round(Number(b.amount) || 10)));
+  const message = String(b.message || '').trim().slice(0, 500);
+
+  const existing = await CreditRequest.findOne({ userId: req.user.id, status: 'pending' });
+  if (existing) {
+    return fail(res, "You already have a request pending — the admin will review it soon.", 409, {
+      error: 'request_pending',
+    });
+  }
+
+  const user = await User.findById(req.user.id).select('FirstName LastName Email').lean();
+  const doc = await CreditRequest.create({
+    userId: req.user.id,
+    userName: user ? `${user.FirstName || ''} ${user.LastName || ''}`.trim() : '',
+    userEmail: user ? user.Email : '',
+    amount,
+    message,
+  });
+
+  return created(
+    res,
+    { id: String(doc._id), status: doc.status, amount: doc.amount },
+    'Your request has been sent to the admin.'
+  );
 });
 
 // GET /api/ai/jobs/:jobId  — only the owner can poll their own job.
@@ -196,4 +253,4 @@ const history = asyncHandler(async (req, res) => {
   return ok(res, { total: items.length, items }, 'Try-on history');
 });
 
-module.exports = { tryon, getJob, models, history, balance };
+module.exports = { tryon, getJob, models, history, balance, requestCredits };

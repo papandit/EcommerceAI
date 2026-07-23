@@ -9,6 +9,7 @@ router.use(express.json({ limit: '12mb' }));
 
 router.get('/models', auth, ctrl.models);
 router.get('/tryon/credits', auth, ctrl.balance);
+router.post('/tryon/credits/request', auth, ctrl.requestCredits);
 router.get('/tryon/history', auth, ctrl.history);
 router.post('/tryon', auth, ctrl.tryon);
 router.get('/jobs/:jobId', auth, ctrl.getJob);
